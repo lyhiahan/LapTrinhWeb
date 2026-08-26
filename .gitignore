@@ -1,0 +1,7 @@
+# Ignore target and build files
+target/
+.settings/
+.classpath
+.project
+.factorypath
+upload/
