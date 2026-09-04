@@ -52,7 +52,6 @@ public class RegisterController extends HttpServlet {
 
         boolean isSuccess = service.register(username, password, email, fullname, phone);
         if (isSuccess) {
-            // Chuyển tới trang xác thực OTP thay vì login
             resp.sendRedirect(req.getContextPath() + "/verify-otp?email=" + email);
         } else {
             alertMsg = "Lỗi hệ thống!";

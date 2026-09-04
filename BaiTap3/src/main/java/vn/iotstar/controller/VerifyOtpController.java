@@ -36,7 +36,6 @@ public class VerifyOtpController extends HttpServlet {
 
         IUserService service = new UserServiceImpl();
 
-        // Gửi lại OTP
         if ("resend".equals(action)) {
             boolean sent = service.sendOtp(email);
             if (sent) {
@@ -49,7 +48,6 @@ public class VerifyOtpController extends HttpServlet {
             return;
         }
 
-        // Xác thực OTP
         boolean isValid = service.verifyOtp(email, otp);
         if (isValid) {
             resp.sendRedirect(req.getContextPath() + "/login?activated=true");

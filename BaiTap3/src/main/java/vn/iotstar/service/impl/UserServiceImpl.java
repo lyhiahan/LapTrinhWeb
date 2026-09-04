@@ -17,7 +17,7 @@ public class UserServiceImpl implements IUserService {
         User user = this.findByUsername(username);
         if (user != null && password.equals(user.getPassWord())) {
             if (!user.getIsActive()) {
-                return null; // Tài khoản chưa kích hoạt
+                return null;
             }
             return user;
         }
@@ -45,7 +45,6 @@ public class UserServiceImpl implements IUserService {
         user.setIsActive(false);
         userDao.insert(user);
 
-        // Gửi OTP kích hoạt
         sendOtp(email);
         return true;
     }
@@ -59,7 +58,6 @@ public class UserServiceImpl implements IUserService {
 
         String otp = EmailUtil.generateOtp();
         user.setOtp(otp);
-        // OTP hết hạn sau 120 giây (2 phút)
         user.setOtpExpiry(new java.util.Date(System.currentTimeMillis() + 120 * 1000));
         userDao.update(user);
 
@@ -73,7 +71,6 @@ public class UserServiceImpl implements IUserService {
             return false;
         }
 
-        // Kiểm tra OTP đúng và chưa hết hạn
         if (otp.equals(user.getOtp()) && user.getOtpExpiry() != null
                 && user.getOtpExpiry().after(new java.util.Date())) {
             user.setIsActive(true);

@@ -67,7 +67,6 @@ public class LoginController extends HttpServlet {
 
         IUserService service = new UserServiceImpl();
 
-        // Kiểm tra tài khoản chưa kích hoạt
         User checkUser = service.findByUsername(username);
         if (checkUser != null && password.equals(checkUser.getPassWord()) && !checkUser.getIsActive()) {
             alertMsg = "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để xác thực OTP.";

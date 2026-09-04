@@ -34,7 +34,6 @@ public class CategoryController extends HttpServlet {
         String url = req.getRequestURI();
 
         if (url.contains("/admin/categories")) {
-            // Danh sách
             try {
                 List<Category> cateList = cateService.findAll();
                 req.setAttribute("cateList", cateList);
@@ -46,12 +45,10 @@ public class CategoryController extends HttpServlet {
             dispatcher.forward(req, resp);
 
         } else if (url.contains("/admin/category/add")) {
-            // Form thêm mới
             RequestDispatcher dispatcher = req.getRequestDispatcher("/views/admin/add-category.jsp");
             dispatcher.forward(req, resp);
 
         } else if (url.contains("/admin/category/edit")) {
-            // Form sửa
             String id = req.getParameter("id");
             Category category = cateService.findById(Integer.parseInt(id));
             req.setAttribute("category", category);
@@ -59,7 +56,6 @@ public class CategoryController extends HttpServlet {
             dispatcher.forward(req, resp);
 
         } else if (url.contains("/admin/category/delete")) {
-            // Xóa
             String id = req.getParameter("id");
             try {
                 cateService.delete(Integer.parseInt(id));
@@ -77,13 +73,10 @@ public class CategoryController extends HttpServlet {
         String url = req.getRequestURI();
 
         if (url.contains("/admin/category/insert")) {
-            // Thêm mới
             Category category = new Category();
             try {
                 String name = req.getParameter("name");
                 category.setName(name);
-
-                // Bỏ xử lý price và icon theo yêu cầu
 
                 cateService.insert(category);
                 resp.sendRedirect(req.getContextPath() + "/admin/categories?message=add_success");
@@ -94,7 +87,6 @@ public class CategoryController extends HttpServlet {
             }
 
         } else if (url.contains("/admin/category/update")) {
-            // Cập nhật
             Category category = new Category();
             try {
                 String idStr = req.getParameter("id");
@@ -103,8 +95,6 @@ public class CategoryController extends HttpServlet {
                     category.setId(Integer.parseInt(idStr));
                 }
                 category.setName(name);
-
-                // Bỏ xử lý price và icon theo yêu cầu
 
                 cateService.update(category);
                 resp.sendRedirect(req.getContextPath() + "/admin/categories?message=edit_success");

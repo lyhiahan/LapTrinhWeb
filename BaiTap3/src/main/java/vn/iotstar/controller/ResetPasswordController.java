@@ -38,7 +38,6 @@ public class ResetPasswordController extends HttpServlet {
 
         IUserService service = new UserServiceImpl();
 
-        // Kiểm tra mật khẩu xác nhận
         if (!newPassword.equals(confirmPassword)) {
             req.setAttribute("alert", "Mật khẩu xác nhận không khớp!");
             req.setAttribute("email", email);
@@ -46,7 +45,6 @@ public class ResetPasswordController extends HttpServlet {
             return;
         }
 
-        // Xác thực OTP cho reset password (không kích hoạt tài khoản)
         User user = service.findByEmail(email);
         if (user == null || user.getOtp() == null || !otp.equals(user.getOtp())
                 || user.getOtpExpiry() == null || user.getOtpExpiry().before(new java.util.Date())) {
