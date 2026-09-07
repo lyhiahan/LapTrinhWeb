@@ -148,7 +148,7 @@
                 <a href="${pageContext.request.contextPath}/product/detail?id=${p.productId}" class="product-card">
                     <div class="img-wrap">
                         <c:choose>
-                            <c:when test="${p.image != null && p.image.startsWith('http')}">
+                            <c:when test="${not empty p.image && p.image.startsWith('http')}">
                                 <img src="${p.image}" alt="${p.productName}"/>
                             </c:when>
                             <c:otherwise>

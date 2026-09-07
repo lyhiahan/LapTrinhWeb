@@ -35,7 +35,7 @@ public class User implements Serializable {
     private String fullName;
 
     @Column(name = "password", columnDefinition = "VARCHAR(50) NOT NULL")
-    private String passWord;
+    private String password;
 
     @Column(name = "avatar", columnDefinition = "VARCHAR(255) NULL")
     private String avatar;
@@ -62,12 +62,12 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String email, String userName, String fullName, String passWord,
+    public User(String email, String userName, String fullName, String password,
                 String avatar, int roleid, String phone, Date createdDate) {
         this.email = email;
         this.userName = userName;
         this.fullName = fullName;
-        this.passWord = passWord;
+        this.password = password;
         this.avatar = avatar;
         this.roleid = roleid;
         this.phone = phone;
@@ -82,8 +82,8 @@ public class User implements Serializable {
     public void setUserName(String userName) { this.userName = userName; }
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
-    public String getPassWord() { return passWord; }
-    public void setPassWord(String passWord) { this.passWord = passWord; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
     public int getRoleid() { return roleid; }

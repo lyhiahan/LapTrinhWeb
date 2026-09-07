@@ -22,10 +22,10 @@
                 </c:otherwise>
             </c:choose>
         </div>
-        <h2>${account.fullName}</h2>
+        <h2>${sessionScope.account.fullName}</h2>
         
         <c:choose>
-            <c:when test="${account.roleid == 1}">
+            <c:when test="${sessionScope.account.roleid == 1}">
                 <span class="badge badge-admin">Quản trị viên</span>
             </c:when>
             <c:otherwise>
@@ -37,22 +37,22 @@
     <div class="profile-grid">
         <div class="info-box">
             <div class="label">Tài khoản</div>
-            <div class="value">${account.userName}</div>
+            <div class="value">${sessionScope.account.userName}</div>
         </div>
         
         <div class="info-box">
             <div class="label">Email</div>
-            <div class="value">${account.email}</div>
+            <div class="value">${sessionScope.account.email}</div>
         </div>
         
         <div class="info-box">
             <div class="label">Số điện thoại</div>
-            <div class="value">${account.phone}</div>
+            <div class="value">${sessionScope.account.phone}</div>
         </div>
         
         <div class="info-box">
             <div class="label">Ngày tham gia</div>
-            <div class="value">${account.createdDate}</div>
+            <div class="value">${sessionScope.account.createdDate}</div>
         </div>
     </div>
 

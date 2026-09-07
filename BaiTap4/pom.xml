@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>vn.iotstar</groupId>
-  <artifactId>BaiTap3</artifactId>
+  <artifactId>BaiTap4</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
 
@@ -30,11 +30,6 @@
       <artifactId>jakarta.servlet.jsp.jstl</artifactId>
       <version>3.0.1</version>
     </dependency>
-    <dependency>
-      <groupId>jakarta.servlet.jsp.jstl</groupId>
-      <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-      <version>3.0.0</version>
-    </dependency>
 
     <!-- SQL Server JDBC driver -->
     <dependency>
@@ -49,6 +44,13 @@
       <artifactId>hibernate-core</artifactId>
       <version>6.6.1.Final</version>
       <scope>compile</scope>
+    </dependency>
+    
+    <!-- Byte Buddy for Hibernate 6.x -->
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>1.14.19</version>
     </dependency>
 
     <!-- Lombok -->
@@ -92,7 +94,7 @@
   </dependencies>
 
   <build>
-    <finalName>BaiTap3</finalName>
+    <finalName>BaiTap4</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>

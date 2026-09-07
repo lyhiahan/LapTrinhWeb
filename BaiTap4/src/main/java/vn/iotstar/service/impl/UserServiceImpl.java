@@ -15,7 +15,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User login(String username, String password) {
         User user = this.findByUsername(username);
-        if (user != null && password.equals(user.getPassWord())) {
+        if (user != null && password.equals(user.getPassword())) {
             if (!user.getIsActive()) {
                 return null;
             }
@@ -88,7 +88,7 @@ public class UserServiceImpl implements IUserService {
         if (user == null) {
             return false;
         }
-        user.setPassWord(newPassword);
+        user.setPassword(newPassword);
         user.setOtp(null);
         user.setOtpExpiry(null);
         userDao.update(user);

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <!-- Decorator cho các trang user -->
+    <mapping path="/views/home.jsp" decorator="/views/decorator/main-layout.jsp"/>
+    <mapping path="/views/product-list.jsp" decorator="/views/decorator/main-layout.jsp"/>
+    <mapping path="/views/product-detail.jsp" decorator="/views/decorator/main-layout.jsp"/>
+    <mapping path="/views/profile.jsp" decorator="/views/decorator/main-layout.jsp"/>
+    <mapping path="/views/waiting.jsp" decorator="/views/decorator/main-layout.jsp"/>
+
+    <!-- Không apply decorator cho các trang auth -->
+    <mapping path="/views/login.jsp" exclue="true"/>
+    <mapping path="/views/register.jsp" exclude="true"/>
+    <mapping path="/views/forgot-password.jsp" exclude="true"/>
+    <mapping path="/views/reset-password.jsp" exclude="true"/>
+    <mapping path="/views/verify-otp.jsp" exclude="true"/>
+
+    <!-- Không apply decorator cho các trang admin -->
+    <mapping path="/views/admin/*" exclude="true"/>
+
+    <!-- Không apply decorator cho decorator -->
+    <mapping path="/views/decorator/*" exclude="true"/>
+</sitemesh>
