@@ -148,4 +148,32 @@ public class ProductDaoImpl implements IProductDao {
             enma.close();
         }
     }
+
+    @Override
+    public int countByCategoryId(int cateId) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        String jpql = "SELECT COUNT(p) FROM Product p WHERE p.category.id = :cateId";
+        try {
+            Query query = enma.createQuery(jpql);
+            query.setParameter("cateId", cateId);
+            return ((Long) query.getSingleResult()).intValue();
+        } finally {
+            enma.close();
+        }
+    }
+
+    @Override
+    public List<Product> findPaginatedByCategoryId(int cateId, int page, int pageSize) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        String jpql = "SELECT p FROM Product p LEFT JOIN FETCH p.category WHERE p.category.id = :cateId ORDER BY p.createdDate DESC";
+        try {
+            TypedQuery<Product> query = enma.createQuery(jpql, Product.class);
+            query.setParameter("cateId", cateId);
+            query.setFirstResult((page - 1) * pageSize);
+            query.setMaxResults(pageSize);
+            return query.getResultList();
+        } finally {
+            enma.close();
+        }
+    }
 }

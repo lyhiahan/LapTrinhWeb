@@ -13,4 +13,6 @@ public interface IProductDao {
     List<Product> findPaginated(int page, int pageSize);
     int count();
     List<Product> findByCategoryId(int cateId);
+    int countByCategoryId(int cateId);
+    List<Product> findPaginatedByCategoryId(int cateId, int page, int pageSize);
 }

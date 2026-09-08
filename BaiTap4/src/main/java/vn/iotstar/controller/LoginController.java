@@ -45,25 +45,31 @@ public class LoginController extends HttpServlet {
         resp.setContentType("text/html");
         resp.setCharacterEncoding("UTF-8");
         req.setCharacterEncoding("UTF-8");
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
+        String username = req.getParameter("username") != null ? req.getParameter("username").trim() : "";
+        String password = req.getParameter("password") != null ? req.getParameter("password") : "";
         boolean isRememberMe = "on".equals(req.getParameter("remember"));
         String alertMsg = "";
-        if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
-            alertMsg = "Tài khoản hoặc mật khẩu không được rỗng";
+
+        req.setAttribute("username", username);
+
+        if (username.isEmpty() || password.isEmpty()) {
+            alertMsg = "Tài khoản và mật khẩu không được để trống!";
             req.setAttribute("alert", alertMsg);
             req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
             return;
         }
+
         IUserService service = new UserServiceImpl();
         User checkUser = service.findByUsername(username);
+
         if (checkUser != null && password.equals(checkUser.getPassword()) && !checkUser.getIsActive()) {
-            alertMsg = "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để xác thực OTP.";
+            alertMsg = "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để xác thực mã OTP.";
             req.setAttribute("alert", alertMsg);
             req.setAttribute("inactiveEmail", checkUser.getEmail());
             req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
             return;
         }
+
         User user = service.login(username, password);
         if (user != null) {
             HttpSession session = req.getSession(true);
@@ -73,7 +79,7 @@ public class LoginController extends HttpServlet {
             }
             resp.sendRedirect(req.getContextPath() + "/home");
         } else {
-            alertMsg = "Tài khoản hoặc mật khẩu không đúng";
+            alertMsg = "Tên tài khoản hoặc mật khẩu không chính xác!";
             req.setAttribute("alert", alertMsg);
             req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
         }

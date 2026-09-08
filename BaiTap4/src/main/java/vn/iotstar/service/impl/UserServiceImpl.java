@@ -58,8 +58,12 @@ public class UserServiceImpl implements IUserService {
 
         String otp = EmailUtil.generateOtp();
         user.setOtp(otp);
-        user.setOtpExpiry(new java.util.Date(System.currentTimeMillis() + 120 * 1000));
+        user.setOtpExpiry(new java.util.Date(System.currentTimeMillis() + 5 * 60 * 1000)); // Hạn 5 phút
         userDao.update(user);
+
+        System.out.println("=================================================");
+        System.out.println(">>> [OTP SYSTEM] Email: " + email + " | MÃ OTP: " + otp);
+        System.out.println("=================================================");
 
         return EmailUtil.sendOtpEmail(email, otp, "Mã xác thực OTP - ShoppingAdmin");
     }

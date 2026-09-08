@@ -3,239 +3,213 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Dashboard - Chỉnh Sửa Sản Phẩm</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-        font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-        background-color: #f8f9fa; display: flex; flex-direction: column;
-        height: 100vh; color: #212529;
-    }
-    .top-header {
-        background: #212529; height: 56px;
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 0 24px; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .top-header .logo-area { font-size: 20px; font-weight: 700; color: #ffffff; }
-    .top-header .header-right { display: flex; align-items: center; gap: 16px; }
-    .top-header .greeting { font-size: 14px; color: #f8f9fa; }
-    .btn-logout {
-        background: #fa5252; color: white; padding: 6px 18px; border-radius: 8px;
-        text-decoration: none; font-size: 13px; font-weight: 500;
-        transition: background 0.2s; border: 1px solid #e03131;
-    }
-    .btn-logout:hover { background: #e03131; }
-    .workspace-wrapper { display: flex; flex: 1; overflow: hidden; }
-    .app-sidebar {
-        width: 240px; background: #343a40; color: #ffffff;
-        display: flex; flex-direction: column; overflow-y: auto;
-    }
-    .user-card {
-        display: flex; flex-direction: column; align-items: center;
-        padding: 28px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .user-card img {
-        width: 80px; height: 80px; border-radius: 50%;
-        border: 3px solid rgba(255,255,255,0.15); object-fit: cover; background: #ffffff;
-    }
-    .user-card .admin-label { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 12px; }
-    .navigation-menu { width: 100%; display: flex; flex-direction: column; padding-top: 8px; }
-    .nav-link {
-        padding: 13px 20px; color: rgba(255,255,255,0.75);
-        text-decoration: none; font-size: 14px;
-        display: flex; align-items: center; gap: 12px;
-        transition: all 0.2s; font-weight: 500; border-left: 4px solid transparent;
-    }
-    .nav-link:hover { background: rgba(255,255,255,0.05); color: #ffffff; }
-    .nav-link i { width: 20px; text-align: center; font-size: 16px; }
-    .sub-menu { display: flex; flex-direction: column; background: rgba(0,0,0,0.15); }
-    .sub-link {
-        padding: 10px 20px 10px 56px; color: rgba(255,255,255,0.65);
-        text-decoration: none; font-size: 13px; transition: all 0.2s;
-        display: flex; align-items: center; gap: 8px;
-    }
-    .sub-link:hover { color: #ffffff; background: rgba(255,255,255,0.05); }
-    .sub-link.active { color: #74c0fc; font-weight: 700; }
-    .sub-link i { font-size: 8px; width: 14px; text-align: center; }
-    .content-canvas { flex: 1; padding: 30px; overflow-y: auto; }
-    .page-title {
-        color: #212529; font-size: 24px; font-weight: 700; margin-bottom: 6px;
-        border-left: 4px solid #51cf66; padding-left: 12px;
-    }
-    .page-subtitle { color: #6c757d; font-size: 14px; margin-bottom: 24px; padding-left: 16px; }
-    .form-card {
-        background: #ffffff; border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-        padding: 30px; max-width: 600px; border: 1px solid #dee2e6;
-    }
-    .form-card h3 {
-        color: #212529; font-size: 18px; font-weight: 600;
-        margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #e9ecef;
-    }
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-        display: block; font-size: 14px; font-weight: 500;
-        color: #495057; margin-bottom: 8px;
-    }
-    .form-group input[type="text"], .form-group input[type="number"],
-    .form-group input[type="file"], .form-group select, .form-group textarea {
-        width: 100%; padding: 10px 12px;
-        border: 1px solid #ced4da; border-radius: 8px;
-        font-size: 14px; outline: none; font-family: 'Roboto', sans-serif;
-        transition: border-color 0.2s; color: #212529;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #495057; }
-    .form-group input[type="file"] { padding: 8px 12px; background: #f8f9fa; }
-    .form-group textarea { resize: vertical; min-height: 100px; }
-    .error-msg {
-        background: #fff5f5; color: #c92a2a; padding: 10px 14px;
-        border-radius: 8px; margin-bottom: 16px; font-size: 13px;
-        border-left: 4px solid #fa5252;
-    }
-    .btn-group { display: flex; gap: 12px; margin-top: 28px; }
-    .btn-group button, .btn-group a {
-        padding: 10px 24px; border: none; border-radius: 8px;
-        font-weight: 500; font-size: 14px; cursor: pointer;
-        text-decoration: none; text-align: center;
-        font-family: 'Roboto', sans-serif; transition: all 0.2s;
-    }
-    .btn-submit { background: #e7f5ff; color: #1c7ed6; border: 1px solid #a5d8ff; }
-    .btn-submit:hover { background: #d0ebff; color: #1864ab; }
-    .btn-back { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
-    .btn-back:hover { background: #e9ecef; }
-    .current-image { margin-top: 8px; }
-    .current-image img {
-        width: 130px; height: 95px; object-fit: cover; border-radius: 10px;
-        border: 1px solid #dee2e6; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .img-preview-area { margin-top: 12px; display: none; }
-    .img-preview-area img {
-        width: 130px; height: 95px; border-radius: 10px;
-        border: 1px solid #dee2e6; object-fit: cover;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .img-preview-area .preview-label { font-size: 12px; color: #495057; margin-bottom: 4px; font-weight: 500; }
-</style>
+    <title>Chỉnh Sửa Sản Phẩm - Admin</title>
 </head>
 <body>
-    <div class="top-header">
-        <div class="logo-area">Dashboard</div>
-        <div class="header-right">
-            <c:if test="${not empty sessionScope.account}">
-                <span class="greeting">Xin chào <b>${sessionScope.account.fullName}</b></span>
-            </c:if>
-            <a href="<c:url value='/logout'/>" class="btn-logout">Đăng xuất</a>
-        </div>
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="<c:url value='/admin/products'/>" class="text-decoration-none">Sản phẩm</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa #${product.productId}</li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold mb-1"><i class="fas fa-pen-to-square text-primary me-2"></i>Chỉnh Sửa Sản Phẩm</h3>
+        <p class="text-muted small mb-0">Cập nhật thông tin chi tiết, giá bán và hình ảnh cho sản phẩm #${product.productId}</p>
     </div>
 
-    <div class="workspace-wrapper">
-        <div class="app-sidebar">
-            <div class="user-card">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=ffffff&color=343a40&size=128&bold=true&font-size=0.4" alt="Admin"/>
-                <div class="admin-label">Bạn là Admin</div>
-            </div>
-            <div class="navigation-menu">
-                <a href="${pageContext.request.contextPath}/home" class="nav-link">
-                    <i class="fas fa-home" style="color: #fcc419;"></i> Trang chủ
-                </a>
-                <a href="<c:url value='/admin/categories'/>" class="nav-link">
-                    <i class="fas fa-list" style="color: #339af0;"></i> Quản lý Danh mục
-                </a>
-                <a href="<c:url value='/admin/products'/>" class="nav-link" style="background: rgba(255,255,255,0.05); color: #74c0fc;">
-                    <i class="fas fa-box" style="color: #51cf66;"></i> Quản lý sản phẩm
-                </a>
-                <div class="sub-menu">
-                    <a href="<c:url value='/admin/product/add'/>" class="sub-link">
-                        <i class="fa-regular fa-circle" style="color: rgba(255,255,255,0.5);"></i> Thêm sản phẩm mới
-                    </a>
-                    <a href="<c:url value='/admin/products'/>" class="sub-link active">
-                        <i class="fa-solid fa-circle" style="color: #74c0fc;"></i> Danh sách sản phẩm
-                    </a>
-                </div>
-            </div>
+    <!-- Alert error từ server nếu có -->
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            <i class="fas fa-triangle-exclamation me-2"></i>${error}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    </c:if>
 
-        <div class="content-canvas">
-            <h1 class="page-title">Chỉnh sửa sản phẩm</h1>
-            <p class="page-subtitle">Cập nhật thông tin sản phẩm</p>
+    <div class="row">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <form action="<c:url value='/admin/product/update'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="editProductForm">
+                        <!-- ID ẩn -->
+                        <input type="hidden" name="productId" value="${product.productId}"/>
 
-            <div class="form-card">
-                <h3><i class="fas fa-edit" style="margin-right: 8px;"></i>Cập nhật sản phẩm</h3>
-
-                <c:if test="${not empty error}">
-                    <div class="error-msg"><i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i>${error}</div>
-                </c:if>
-
-                <form action="<c:url value='/admin/product/update'/>" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="productId" value="${product.productId}"/>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-cube" style="margin-right: 6px; color: #495057;"></i>Tên sản phẩm:</label>
-                        <input type="text" name="productName" value="${product.productName}" required/>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-money-bill-wave" style="margin-right: 6px; color: #495057;"></i>Giá (VNĐ):</label>
-                        <input type="text" name="price" value="${product.price}" required/>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-folder" style="margin-right: 6px; color: #495057;"></i>Danh mục:</label>
-                        <select name="categoryId" required>
-                            <option value="">-- Chọn danh mục --</option>
-                            <c:forEach items="${cateList}" var="cate">
-                                <option value="${cate.id}" ${product.category != null && product.category.id == cate.id ? 'selected' : ''}>${cate.name}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-align-left" style="margin-right: 6px; color: #495057;"></i>Mô tả:</label>
-                        <textarea name="description">${product.description}</textarea>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-image" style="margin-right: 6px; color: #495057;"></i>Hình ảnh hiện tại:</label>
-                        <div class="current-image">
-                            <c:choose>
-                                <c:when test="${product.image != null && product.image.startsWith('http')}">
-                                    <img src="${product.image}" alt="Current"/>
-                                </c:when>
-                                <c:otherwise>
-                                    <c:url value="/image?fname=${product.image}" var="oldImgUrl"/>
-                                    <img src="${oldImgUrl}" alt="Current"/>
-                                </c:otherwise>
-                            </c:choose>
+                        <!-- Tên sản phẩm -->
+                        <div class="mb-3">
+                            <label for="productName" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-cube text-muted me-1"></i> Tên sản phẩm <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="productName"
+                                   name="productName"
+                                   value="${product.productName}"
+                                   placeholder="Nhập tên sản phẩm..."
+                                   minlength="2"
+                                   maxlength="255"
+                                   required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên sản phẩm hợp lệ (từ 2 đến 255 ký tự).
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-upload" style="margin-right: 6px; color: #495057;"></i>Thay đổi ảnh mới (để trống nếu giữ nguyên):</label>
-                        <input type="file" name="image" accept="image/*" id="imageInput"/>
-                        <div class="img-preview-area" id="previewArea">
-                            <div class="preview-label">Ảnh mới:</div>
-                            <img id="previewImg" src="" alt="Preview"/>
+
+                        <!-- Danh mục & Giá -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label for="categoryId" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-folder text-muted me-1"></i> Danh mục phân loại <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="categoryId" name="categoryId" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <c:forEach items="${cateList}" var="cate">
+                                        <option value="${cate.id}" ${product.category != null && product.category.id == cate.id ? 'selected' : ''}>
+                                            ${cate.name}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Vui lòng chọn một danh mục cho sản phẩm.
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <label for="price" class="form-label fw-semibold text-dark">
+                                    <i class="fas fa-money-bill-wave text-muted me-1"></i> Đơn giá (VNĐ) <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group has-validation">
+                                    <input type="number"
+                                           class="form-control"
+                                           id="price"
+                                           name="price"
+                                           value="${product.price}"
+                                           placeholder="Ví dụ: 150000"
+                                           min="1000"
+                                           step="1000"
+                                           required>
+                                    <span class="input-group-text bg-light text-muted">đ</span>
+                                    <div class="invalid-feedback">
+                                        Vui lòng nhập giá bán hợp lệ (lớn hơn hoặc bằng 1,000 VNĐ).
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="btn-group">
-                        <button type="submit" class="btn-submit"><i class="fas fa-save" style="margin-right: 6px;"></i>Lưu thay đổi</button>
-                        <a href="<c:url value='/admin/products'/>" class="btn-back"><i class="fas fa-arrow-left" style="margin-right: 6px;"></i>Hủy bỏ</a>
-                    </div>
-                </form>
+
+                        <!-- Mô tả chi tiết -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-align-left text-muted me-1"></i> Mô tả tóm tắt sản phẩm
+                            </label>
+                            <textarea class="form-control"
+                                      id="description"
+                                      name="description"
+                                      rows="4"
+                                      placeholder="Mô tả các thông số, ưu điểm nổi bật của sản phẩm...">${product.description}</textarea>
+                        </div>
+
+                        <!-- Hình ảnh sản phẩm -->
+                        <div class="mb-4">
+                            <label for="imageInput" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-image text-muted me-1"></i> Thay đổi ảnh sản phẩm (để trống nếu giữ nguyên ảnh cũ)
+                            </label>
+
+                            <!-- Ảnh hiện tại -->
+                            <c:if test="${not empty product.image}">
+                                <div class="mb-3 p-2 border rounded-3 bg-light d-inline-flex align-items-center gap-3">
+                                    <c:choose>
+                                        <c:when test="${product.image.startsWith('http')}">
+                                            <img src="${product.image}" alt="${product.productName}" class="rounded-2 border object-fit-cover" style="width: 60px; height: 60px;">
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="<c:url value='/image?fname=${product.image}'/>" alt="${product.productName}" class="rounded-2 border object-fit-cover" style="width: 60px; height: 60px;">
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <div class="small text-muted">Ảnh hiện tại trên hệ thống</div>
+                                </div>
+                            </c:if>
+
+                            <input type="file"
+                                   class="form-control"
+                                   id="imageInput"
+                                   name="image"
+                                   accept="image/png, image/jpeg, image/jpg, image/webp, image/gif">
+                            <div class="invalid-feedback" id="imageFeedback">
+                                Vui lòng chọn một tệp hình ảnh hợp lệ (.jpg, .jpeg, .png, .webp).
+                            </div>
+
+                            <div class="mt-3 text-center p-3 border rounded-3 bg-light d-none" id="previewContainer">
+                                <div class="small text-muted mb-2">Ảnh mới xem trước:</div>
+                                <img id="previewImg" src="" alt="Preview" class="rounded-3 shadow-sm border object-fit-cover" style="max-height: 180px; max-width: 100%;">
+                            </div>
+                        </div>
+
+                        <!-- Nút hành động -->
+                        <div class="d-flex gap-2 pt-2 border-top">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                                <i class="fas fa-save me-1"></i> Lưu thay đổi
+                            </button>
+                            <a href="<c:url value='/admin/products'/>" class="btn btn-light rounded-pill px-4 border">
+                                <i class="fas fa-arrow-left me-1"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('imageInput').addEventListener('change', function(e) {
-            var file = e.target.files[0];
+        const imageInput = document.getElementById('imageInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImg = document.getElementById('previewImg');
+        const imageFeedback = document.getElementById('imageFeedback');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
-                var reader = new FileReader();
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    imageInput.setCustomValidity('Chỉ chấp nhận tệp hình ảnh (jpg, png, webp, gif)!');
+                    imageFeedback.textContent = 'Định dạng tệp không hợp lệ! Vui lòng chọn ảnh định dạng JPG, PNG, WEBP.';
+                    previewContainer.classList.add('d-none');
+                    return;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    imageInput.setCustomValidity('Kích thước ảnh tối đa 10MB!');
+                    imageFeedback.textContent = 'Kích thước tệp ảnh quá lớn (tối đa 10MB).';
+                    previewContainer.classList.add('d-none');
+                    return;
+                }
+                imageInput.setCustomValidity('');
+                const reader = new FileReader();
                 reader.onload = function(ev) {
-                    document.getElementById('previewImg').src = ev.target.result;
-                    document.getElementById('previewArea').style.display = 'block';
+                    previewImg.src = ev.target.result;
+                    previewContainer.classList.remove('d-none');
                 };
                 reader.readAsDataURL(file);
+            } else {
+                previewContainer.classList.add('d-none');
             }
         });
+
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    const priceInput = document.getElementById('price');
+                    if (priceInput && (parseFloat(priceInput.value) <= 0 || isNaN(parseFloat(priceInput.value)))) {
+                        priceInput.setCustomValidity('Giá phải lớn hơn 0');
+                    } else if (priceInput) {
+                        priceInput.setCustomValidity('');
+                    }
+
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
     </script>
 </body>
 </html>

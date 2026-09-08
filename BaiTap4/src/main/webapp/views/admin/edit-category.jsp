@@ -3,237 +3,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Dashboard - Chỉnh Sửa Danh Mục</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-        font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-        background-color: #f8f9fa;
-        display: flex; flex-direction: column;
-        height: 100vh; color: #212529;
-    }
-
-    .top-header {
-        background: #212529;
-        height: 56px;
-        display: flex; justify-content: space-between; align-items: center;
-        padding: 0 24px;
-        z-index: 100;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .top-header .logo-area { font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; }
-    .top-header .header-right { display: flex; align-items: center; gap: 16px; }
-    .top-header .greeting { font-size: 14px; color: #f8f9fa; }
-    .top-header .greeting b { font-weight: 500; }
-    .btn-logout {
-        background: #fa5252; color: white;
-        padding: 6px 18px; border-radius: 8px;
-        text-decoration: none; font-size: 13px; font-weight: 500;
-        transition: background 0.2s;
-        border: 1px solid #e03131;
-    }
-    .btn-logout:hover { background: #e03131; }
-
-    .workspace-wrapper { display: flex; flex: 1; overflow: hidden; }
-
-    .app-sidebar {
-        width: 240px; background: #343a40; color: #ffffff;
-        display: flex; flex-direction: column;
-        overflow-y: auto;
-    }
-    .user-card {
-        display: flex; flex-direction: column; align-items: center;
-        padding: 28px 20px 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .user-card img {
-        width: 80px; height: 80px; border-radius: 50%;
-        border: 3px solid rgba(255,255,255,0.15);
-        object-fit: cover; background: #ffffff;
-    }
-    .user-card .admin-label { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 12px; font-weight: 400; }
-
-    .navigation-menu { width: 100%; display: flex; flex-direction: column; padding-top: 8px; }
-    .nav-link {
-        padding: 13px 20px; color: rgba(255,255,255,0.75);
-        text-decoration: none; font-size: 14px;
-        display: flex; align-items: center; gap: 12px;
-        transition: all 0.2s; font-weight: 500;
-        border-left: 4px solid transparent;
-    }
-    .nav-link:hover { background: rgba(255,255,255,0.05); color: #ffffff; }
-    .nav-link i { width: 20px; text-align: center; font-size: 16px; }
-
-    .sub-menu { display: flex; flex-direction: column; background: rgba(0,0,0,0.15); }
-    .sub-link {
-        padding: 10px 20px 10px 56px; color: rgba(255,255,255,0.65);
-        text-decoration: none; font-size: 13px; transition: all 0.2s;
-        display: flex; align-items: center; gap: 8px;
-    }
-    .sub-link:hover { color: #ffffff; background: rgba(255,255,255,0.05); }
-    .sub-link.active { color: #74c0fc; font-weight: 700; }
-    .sub-link i { font-size: 8px; width: 14px; text-align: center; }
-
-    .content-canvas { flex: 1; padding: 30px; overflow-y: auto; }
-
-    .page-title {
-        color: #212529; font-size: 24px; font-weight: 700; margin-bottom: 6px;
-        border-left: 4px solid #339af0; padding-left: 12px;
-    }
-    .page-subtitle { color: #6c757d; font-size: 14px; margin-bottom: 24px; padding-left: 16px; }
-
-    .form-card {
-        background: #ffffff; border-radius: 12px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-        padding: 30px; max-width: 550px;
-        border: 1px solid #dee2e6;
-    }
-    .form-card h3 {
-        color: #212529; font-size: 18px; font-weight: 600;
-        margin-bottom: 24px; padding-bottom: 12px;
-        border-bottom: 2px solid #e9ecef;
-    }
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-        display: block; font-size: 14px; font-weight: 500;
-        color: #495057; margin-bottom: 8px;
-    }
-    .form-group input[type="text"],
-    .form-group input[type="number"],
-    .form-group input[type="file"] {
-        width: 100%; padding: 10px 12px;
-        border: 1px solid #ced4da; border-radius: 8px;
-        font-size: 14px; outline: none;
-        font-family: 'Roboto', sans-serif;
-        transition: border-color 0.2s;
-        color: #212529;
-    }
-    .form-group input[type="text"]:focus { border-color: #495057; }
-    .form-group input[type="file"] { padding: 8px 12px; background: #f8f9fa; }
-
-    .error-msg {
-        background: #fff5f5; color: #c92a2a;
-        padding: 10px 14px; border-radius: 8px;
-        margin-bottom: 16px; font-size: 13px;
-        border-left: 4px solid #fa5252;
-    }
-
-    .btn-group { display: flex; gap: 12px; margin-top: 28px; }
-    .btn-group button, .btn-group a {
-        padding: 10px 24px; border: none; border-radius: 8px;
-        font-weight: 500; font-size: 14px; cursor: pointer;
-        text-decoration: none; text-align: center;
-        font-family: 'Roboto', sans-serif;
-        transition: all 0.2s;
-    }
-    .btn-submit { background: #e7f5ff; color: #1c7ed6; border: 1px solid #a5d8ff; }
-    .btn-submit:hover { background: #d0ebff; color: #1864ab; }
-    .btn-back { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
-    .btn-back:hover { background: #e9ecef; }
-
-    .current-image {
-        margin-top: 8px;
-    }
-    .current-image img {
-        width: 130px; height: 95px;
-        object-fit: cover; border-radius: 10px;
-        border: 1px solid #dee2e6;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .img-preview-area {
-        margin-top: 12px;
-        display: none;
-    }
-    .img-preview-area img {
-        width: 130px; height: 95px;
-        border-radius: 10px; border: 1px solid #dee2e6;
-        object-fit: cover;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .img-preview-area .preview-label {
-        font-size: 12px; color: #495057;
-        margin-bottom: 4px; font-weight: 500;
-    }
-</style>
+    <title>Chỉnh Sửa Danh Mục - Admin</title>
 </head>
 <body>
-    <div class="top-header">
-        <div class="logo-area">Dashboard</div>
-        <div class="header-right">
-            <c:if test="${not empty sessionScope.account}">
-                <span class="greeting">Xin chào <b>${sessionScope.account.fullName}</b></span>
-            </c:if>
-            <a href="<c:url value='/logout'/>" class="btn-logout">Đăng xuất</a>
-        </div>
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1 small">
+                <li class="breadcrumb-item"><a href="<c:url value='/admin/categories'/>" class="text-decoration-none">Danh mục</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa</li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold mb-1"><i class="fas fa-pen-to-square text-primary me-2"></i>Chỉnh Sửa Danh Mục</h3>
+        <p class="text-muted small mb-0">Cập nhật thông tin phân loại sản phẩm #${category.id}</p>
     </div>
 
-    <div class="workspace-wrapper">
-        <div class="app-sidebar">
-            <div class="user-card">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=ffffff&color=343a40&size=128&bold=true&font-size=0.4" alt="Admin"/>
-                <div class="admin-label">Bạn là Admin</div>
-            </div>
-            <div class="navigation-menu">
-                <a href="${pageContext.request.contextPath}/home" class="nav-link">
-                    <i class="fas fa-home" style="color: #fcc419;"></i> Trang chủ
-                </a>
-                <a href="<c:url value='/admin/categories'/>" class="nav-link" style="background: rgba(255,255,255,0.05); color: #74c0fc;">
-                    <i class="fas fa-list" style="color: #339af0;"></i> Quản lý Danh mục
-                </a>
-                <div class="sub-menu">
-                    <a href="<c:url value='/admin/category/add'/>" class="sub-link">
-                        <i class="fa-regular fa-circle" style="color: rgba(255,255,255,0.5);"></i> Thêm danh mục mới
-                    </a>
-                    <a href="<c:url value='/admin/categories'/>" class="sub-link active">
-                        <i class="fa-solid fa-circle" style="color: #74c0fc;"></i> Danh sách danh mục
-                    </a>
-                </div>
-                <a href="<c:url value='/admin/products'/>" class="nav-link">
-                    <i class="fas fa-box" style="color: #51cf66;"></i> Quản lý sản phẩm
-                </a>
-                <div class="sub-menu">
-                    <a href="<c:url value='/admin/product/add'/>" class="sub-link">
-                        <i class="fa-regular fa-circle" style="color: rgba(255,255,255,0.5);"></i> Thêm sản phẩm mới
-                    </a>
-                    <a href="<c:url value='/admin/products'/>" class="sub-link">
-                        <i class="fa-regular fa-circle" style="color: rgba(255,255,255,0.5);"></i> Danh sách sản phẩm
-                    </a>
-                </div>
-            </div>
+    <!-- Alert error từ server nếu có -->
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            <i class="fas fa-triangle-exclamation me-2"></i>${error}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    </c:if>
 
-        <div class="content-canvas">
-            <h1 class="page-title">Chỉnh sửa danh mục</h1>
-            <p class="page-subtitle">Cập nhật thông tin danh mục hàng hóa</p>
+    <div class="row">
+        <div class="col-lg-6 col-md-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <form action="<c:url value='/admin/category/update'/>" method="post" class="needs-validation" novalidate>
+                        <!-- ID ẩn -->
+                        <input type="hidden" name="id" value="${category.id}"/>
 
-            <div class="form-card">
-                <h3><i class="fas fa-edit" style="margin-right: 8px;"></i>Cập nhật danh mục</h3>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted small">Mã danh mục (ID)</label>
+                            <input type="text" class="form-control bg-light" value="${category.id}" readonly disabled>
+                        </div>
 
-                <c:if test="${not empty error}">
-                    <div class="error-msg"><i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i>${error}</div>
-                </c:if>
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label fw-semibold text-dark">
+                                <i class="fas fa-tag text-muted me-1"></i> Tên danh mục hàng hóa <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="categoryName"
+                                   name="name"
+                                   value="${category.name}"
+                                   placeholder="Nhập tên danh mục..."
+                                   minlength="2"
+                                   maxlength="100"
+                                   required>
+                            <div class="invalid-feedback">
+                                Vui lòng nhập tên danh mục hợp lệ (từ 2 đến 100 ký tự).
+                            </div>
+                        </div>
 
-                <form action="<c:url value='/admin/category/update'/>" method="post">
-                    <input type="hidden" name="id" value="${category.id}"/>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-tag" style="margin-right: 6px; color: #495057;"></i>Tên danh mục hàng hóa:</label>
-                        <input type="text" name="name" value="${category.name}" required/>
-                    </div>
-
-                    <div class="btn-group">
-                        <button type="submit" class="btn-submit"><i class="fas fa-save" style="margin-right: 6px;"></i>Lưu thay đổi</button>
-                        <a href="<c:url value='/admin/categories'/>" class="btn-back"><i class="fas fa-arrow-left" style="margin-right: 6px;"></i>Hủy bỏ</a>
-                    </div>
-                </form>
+                        <div class="d-flex gap-2 pt-2">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                                <i class="fas fa-save me-1"></i> Cập nhật thay đổi
+                            </button>
+                            <a href="<c:url value='/admin/categories'/>" class="btn btn-light rounded-pill px-4 border">
+                                <i class="fas fa-arrow-left me-1"></i> Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
+    <script>
+        (() => {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    const nameInput = document.getElementById('categoryName');
+                    if (nameInput && nameInput.value.trim().length < 2) {
+                        nameInput.setCustomValidity('Tên danh mục phải có ít nhất 2 ký tự!');
+                    } else if (nameInput) {
+                        nameInput.setCustomValidity('');
+                    }
 
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
 </body>
 </html>

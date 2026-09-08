@@ -59,7 +59,7 @@ public class EmailUtil {
                     + "<span style='font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: 8px;'>"
                     + otp + "</span></div>"
                     + "<p style='color: #94a3b8; font-size: 13px; text-align: center;'>"
-                    + "Mã OTP có hiệu lực trong <b>2 phút</b>. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>"
+                    + "Mã OTP có hiệu lực trong <b>5 phút</b>. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>"
                     + "</div>";
 
             message.setContent(htmlContent, "text/html; charset=UTF-8");

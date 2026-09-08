@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemesh>
-    <!-- Mặc định: tất cả các trang đều dùng decorator main-layout -->
-    <mapping path="/*" decorator="/WEB-INF/decorators/main-layout.jsp"/>
+    <decorator-prefix></decorator-prefix>
 
-    <!-- Không apply decorator cho các trang auth -->
+    <!-- 1. Exclude static, auth and error pages -->
     <mapping path="/login" exclude="true"/>
     <mapping path="/register" exclude="true"/>
     <mapping path="/forgot-password" exclude="true"/>
     <mapping path="/reset-password" exclude="true"/>
     <mapping path="/verify-otp" exclude="true"/>
-
-    <!-- Không apply decorator cho các trang admin -->
-    <mapping path="/admin/*" exclude="true"/>
-
-    <!-- Không apply decorator cho image servlet -->
-    <mapping path="/image" exclude="true"/>
-
-    <!-- Không apply decorator cho static resources -->
-    <mapping path="/views/decorator/*" exclude="true"/>
-    <mapping path="/views/style.css" exclude="true"/>
+    <mapping path="/image*" exclude="true"/>
+    <mapping path="/upload/*" exclude="true"/>
+    <mapping path="/views/login.jsp" exclude="true"/>
+    <mapping path="/views/register.jsp" exclude="true"/>
+    <mapping path="/views/forgot-password.jsp" exclude="true"/>
+    <mapping path="/views/reset-password.jsp" exclude="true"/>
+    <mapping path="/views/verify-otp.jsp" exclude="true"/>
     <mapping path="/views/error.jsp" exclude="true"/>
+    <mapping path="/views/style.css" exclude="true"/>
+    <mapping path="/views/decorator/*" exclude="true"/>
+
+    <!-- 2. Admin decorator -->
+    <mapping path="/admin/*" decorator="/views/decorator/admin-layout.jsp"/>
+
+    <!-- 3. Main client decorator -->
+    <mapping path="/*" decorator="/views/decorator/main-layout.jsp"/>
 </sitemesh>

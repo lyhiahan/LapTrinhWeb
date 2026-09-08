@@ -77,4 +77,14 @@ public class ProductServiceImpl implements IProductService {
     public List<Product> findByCategoryId(int cateId) {
         return productDao.findByCategoryId(cateId);
     }
+
+    @Override
+    public int countByCategoryId(int cateId) {
+        return productDao.countByCategoryId(cateId);
+    }
+
+    @Override
+    public List<Product> findPaginatedByCategoryId(int cateId, int page, int pageSize) {
+        return productDao.findPaginatedByCategoryId(cateId, page, pageSize);
+    }
 }

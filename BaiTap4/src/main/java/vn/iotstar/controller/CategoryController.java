@@ -61,9 +61,24 @@ public class CategoryController extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         String url = req.getRequestURI();
         if (url.contains("/admin/category/insert")) {
+            String name = req.getParameter("name") != null ? req.getParameter("name").trim() : "";
+            req.setAttribute("name", name);
+
+            if (name.isEmpty() || name.length() < 2 || name.length() > 100) {
+                req.setAttribute("error", "Tên danh mục phải từ 2 đến 100 ký tự!");
+                req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+                return;
+            }
+
+            Category existCate = cateService.findByName(name);
+            if (existCate != null) {
+                req.setAttribute("error", "Tên danh mục này đã tồn tại trong hệ thống!");
+                req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
+                return;
+            }
+
             Category category = new Category();
             try {
-                String name = req.getParameter("name");
                 category.setName(name);
                 cateService.insert(category);
                 resp.sendRedirect(req.getContextPath() + "/admin/categories?message=add_success");
@@ -73,14 +88,33 @@ public class CategoryController extends HttpServlet {
                 req.getRequestDispatcher("/views/admin/add-category.jsp").forward(req, resp);
             }
         } else if (url.contains("/admin/category/update")) {
+            String idStr = req.getParameter("id");
+            String name = req.getParameter("name") != null ? req.getParameter("name").trim() : "";
             Category category = null;
+
+            if (idStr != null && !idStr.isEmpty()) {
+                category = cateService.findById(Integer.parseInt(idStr));
+            }
+            if (category == null) category = new Category();
+
+            if (name.isEmpty() || name.length() < 2 || name.length() > 100) {
+                category.setName(name);
+                req.setAttribute("category", category);
+                req.setAttribute("error", "Tên danh mục phải từ 2 đến 100 ký tự!");
+                req.getRequestDispatcher("/views/admin/edit-category.jsp").forward(req, resp);
+                return;
+            }
+
+            Category existCate = cateService.findByName(name);
+            if (existCate != null && existCate.getId() != category.getId()) {
+                category.setName(name);
+                req.setAttribute("category", category);
+                req.setAttribute("error", "Tên danh mục này đã tồn tại trên một phân loại khác!");
+                req.getRequestDispatcher("/views/admin/edit-category.jsp").forward(req, resp);
+                return;
+            }
+
             try {
-                String idStr = req.getParameter("id");
-                String name = req.getParameter("name");
-                if (idStr != null && !idStr.isEmpty()) {
-                    category = cateService.findById(Integer.parseInt(idStr));
-                }
-                if (category == null) category = new Category();
                 category.setName(name);
                 cateService.update(category);
                 resp.sendRedirect(req.getContextPath() + "/admin/categories?message=edit_success");

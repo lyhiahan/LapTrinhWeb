@@ -23,8 +23,8 @@ public class VerifyOtpController extends HttpServlet {
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
-        String email = req.getParameter("email");
-        String otp = req.getParameter("otp");
+        String email = req.getParameter("email") != null ? req.getParameter("email").trim() : "";
+        String otp = req.getParameter("otp") != null ? req.getParameter("otp").trim() : "";
         String action = req.getParameter("action");
         IUserService service = new UserServiceImpl();
         if ("resend".equals(action)) {
@@ -32,12 +32,20 @@ public class VerifyOtpController extends HttpServlet {
             if (sent) {
                 req.setAttribute("success", "Đã gửi lại mã OTP mới! Vui lòng kiểm tra email.");
             } else {
-                req.setAttribute("alert", "Không thể gửi lại mã OTP. Vui lòng thử lại.");
+                req.setAttribute("alert", "Không thể gửi lại mã OTP. Vui lòng thử lại sau.");
             }
             req.setAttribute("email", email);
             req.getRequestDispatcher(Constant.Path.VERIFY_OTP).forward(req, resp);
             return;
         }
+
+        if (otp.isEmpty() || !otp.matches("^[0-9]{6}$")) {
+            req.setAttribute("alert", "Vui lòng nhập chính xác 6 chữ số của mã OTP!");
+            req.setAttribute("email", email);
+            req.getRequestDispatcher(Constant.Path.VERIFY_OTP).forward(req, resp);
+            return;
+        }
+
         boolean isValid = service.verifyOtp(email, otp);
         if (isValid) {
             resp.sendRedirect(req.getContextPath() + "/login?activated=true");

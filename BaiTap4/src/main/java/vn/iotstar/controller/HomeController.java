@@ -14,11 +14,14 @@ import vn.iotstar.service.impl.CategoryServiceImpl;
 import vn.iotstar.service.impl.ProductServiceImpl;
 import vn.iotstar.util.Constant;
 @SuppressWarnings("serial")
-@WebServlet(urlPatterns = { "/home", "" })
+@WebServlet(urlPatterns = { "/home" })
 public class HomeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        try {
+            java.nio.file.Files.writeString(java.nio.file.Path.of("D:\\home_called.txt"), "CALLED AT " + java.time.LocalDateTime.now());
+        } catch (Exception ignored) {}
         System.out.println(">>> INSIDE HOME CONTROLLER DOGET <<<");
         resp.setContentType("text/html; charset=UTF-8");
         resp.setCharacterEncoding("UTF-8");

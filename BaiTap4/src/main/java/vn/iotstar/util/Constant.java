@@ -1,7 +1,7 @@
 package vn.iotstar.util;
 
 public class Constant {
-    public static final String DIR = "D:\\LAPTRINH\\LAPTRINHWEB\\BAITAP\\BT\\BaiTap4\\upload";
+    public static final String DIR = "D:\\LAPTRINH\\LAPTRINHWEB\\BAITAP\\BT\\LapTrinhWeb\\BaiTap4\\upload";
     public static final String SESSION_USERNAME = "username";
     public static final String COOKIE_REMEMBER = "username";
 

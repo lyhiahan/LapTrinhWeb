@@ -43,8 +43,22 @@ public class ProfileController extends HttpServlet {
             return;
         }
         User currentUser = (User) session.getAttribute("account");
-        String fullname = req.getParameter("fullname");
-        String phone = req.getParameter("phone");
+        String fullname = req.getParameter("fullname") != null ? req.getParameter("fullname").trim() : "";
+        String phone = req.getParameter("phone") != null ? req.getParameter("phone").trim() : "";
+
+        // Server-side validation
+        if (fullname.isEmpty() || fullname.length() < 2 || fullname.length() > 50) {
+            req.setAttribute("error", "Họ và tên không hợp lệ (từ 2 đến 50 ký tự)!");
+            req.getRequestDispatcher(Constant.Path.PROFILE).forward(req, resp);
+            return;
+        }
+
+        if (phone.isEmpty() || !phone.matches("^(0[3|5|7|8|9])[0-9]{8}$")) {
+            req.setAttribute("error", "Số điện thoại không hợp lệ (phải gồm 10 chữ số của Việt Nam)!");
+            req.getRequestDispatcher(Constant.Path.PROFILE).forward(req, resp);
+            return;
+        }
+
         try {
             String avatarPath = null;
             Part part = req.getPart("avatar");
@@ -52,7 +66,12 @@ public class ProfileController extends HttpServlet {
                 String originalFileName = part.getSubmittedFileName();
                 if (originalFileName != null && !originalFileName.isEmpty()) {
                     int index = originalFileName.lastIndexOf(".");
-                    String ext = originalFileName.substring(index + 1);
+                    String ext = originalFileName.substring(index + 1).toLowerCase();
+                    if (!ext.matches("^(jpg|jpeg|png|webp|gif)$")) {
+                        req.setAttribute("error", "Định dạng tệp ảnh không hợp lệ (chỉ chấp nhận JPG, PNG, WEBP, GIF)!");
+                        req.getRequestDispatcher(Constant.Path.PROFILE).forward(req, resp);
+                        return;
+                    }
                     String fileName = System.currentTimeMillis() + "." + ext;
                     File dir = new File(Constant.DIR + "/avatar");
                     if (!dir.exists()) dir.mkdirs();
