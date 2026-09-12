@@ -1,42 +1,19 @@
 package vn.iotstar.controller;
-import java.io.IOException;
-import java.util.List;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import vn.iotstar.entity.Category;
-import vn.iotstar.entity.Product;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import vn.iotstar.service.ICategoryService;
-import vn.iotstar.service.IProductService;
-import vn.iotstar.service.impl.CategoryServiceImpl;
-import vn.iotstar.service.impl.ProductServiceImpl;
-import vn.iotstar.util.Constant;
-@SuppressWarnings("serial")
-@WebServlet(urlPatterns = { "/home" })
-public class HomeController extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        try {
-            java.nio.file.Files.writeString(java.nio.file.Path.of("D:\\home_called.txt"), "CALLED AT " + java.time.LocalDateTime.now());
-        } catch (Exception ignored) {}
-        System.out.println(">>> INSIDE HOME CONTROLLER DOGET <<<");
-        resp.setContentType("text/html; charset=UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        req.setCharacterEncoding("UTF-8");
-        try {
-            IProductService productService = new ProductServiceImpl();
-            ICategoryService categoryService = new CategoryServiceImpl();
-            List<Product> newestProducts = productService.findNewest(10);
-            List<Category> categories = categoryService.findAll();
-            req.setAttribute("newestProducts", newestProducts);
-            req.setAttribute("categories", categories);
-        } catch (Exception e) {
-            System.err.println(">>> LỖI KẾT NỐI DATABASE: " + e.getMessage());
-            e.printStackTrace();
-        }
-        req.getRequestDispatcher(Constant.Path.HOME).forward(req, resp);
+
+@Controller
+public class HomeController {
+
+    @Autowired
+    private ICategoryService categoryService;
+
+    @GetMapping({"/", "/home"})
+    public String home(Model model) {
+        return "redirect:/admin/categories";
     }
 }

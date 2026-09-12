@@ -234,13 +234,13 @@
                 </c:when>
                 <c:otherwise>
                     <div class="admin-user-initial">
-                        ${fn:toUpperCase(fn:substring(sessionScope.account.fullName, 0, 1))}
+                        ${not empty sessionScope.account.fullName ? fn:toUpperCase(fn:substring(sessionScope.account.fullName, 0, 1)) : 'A'}
                     </div>
                 </c:otherwise>
             </c:choose>
             <div class="overflow-hidden">
                 <div class="fw-bold text-white text-truncate" style="font-size: 0.95rem;">
-                    ${sessionScope.account.fullName}
+                    ${not empty sessionScope.account.fullName ? sessionScope.account.fullName : 'Admin System'}
                 </div>
                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle small py-0 px-2" style="font-size: 0.72rem;">
                     Quản trị viên
@@ -278,7 +278,21 @@
                 </a>
             </div>
 
+            <a href="${pageContext.request.contextPath}/admin/users" class="sidebar-link mt-2 ${pageContext.request.requestURI.contains('/admin/user') ? 'active' : ''}">
+                <i class="fas fa-users-gear text-success"></i>
+                <span>Quản lý Người dùng</span>
+            </a>
+            <div class="ps-2">
+                <a href="${pageContext.request.contextPath}/admin/user/add" class="sidebar-sublink">
+                    <i class="fas fa-user-plus fa-xs"></i> Thêm người dùng
+                </a>
+                <a href="${pageContext.request.contextPath}/admin/users" class="sidebar-sublink">
+                    <i class="fas fa-users fa-xs"></i> Danh sách người dùng
+                </a>
+            </div>
+
             <div class="sidebar-heading mt-3">Hệ thống</div>
+
             <a href="${pageContext.request.contextPath}/home" class="sidebar-link" target="_blank">
                 <i class="fas fa-arrow-up-right-from-square text-success"></i>
                 <span>Xem Website</span>

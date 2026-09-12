@@ -5,253 +5,184 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import vn.iotstar.entity.Category;
 import vn.iotstar.entity.Product;
 import vn.iotstar.service.ICategoryService;
 import vn.iotstar.service.IProductService;
-import vn.iotstar.service.impl.CategoryServiceImpl;
-import vn.iotstar.service.impl.ProductServiceImpl;
 import vn.iotstar.util.Constant;
 
-@SuppressWarnings("serial")
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024,
-    maxFileSize = 1024 * 1024 * 10,
-    maxRequestSize = 1024 * 1024 * 20
-)
-@WebServlet(urlPatterns = { "/admin/products", "/admin/product/add", "/admin/product/insert",
-        "/admin/product/edit", "/admin/product/update", "/admin/product/delete" })
-public class AdminProductController extends HttpServlet {
+@Controller
+@RequestMapping("/admin")
+public class AdminProductController {
 
-    IProductService productService = new ProductServiceImpl();
-    ICategoryService categoryService = new CategoryServiceImpl();
+    @Autowired
+    private IProductService productService;
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String url = req.getRequestURI();
-        if (url.contains("/admin/products")) {
-            try {
-                List<Product> productList = productService.findAll();
-                req.setAttribute("productList", productList);
-            } catch (Exception e) {
-                e.printStackTrace();
-                req.setAttribute("error", "Không thể hiển thị danh sách do lỗi CSDL: " + e.getMessage());
-            }
-            RequestDispatcher dispatcher = req.getRequestDispatcher("/views/admin/list-product.jsp");
-            dispatcher.forward(req, resp);
-        } else if (url.contains("/admin/product/add")) {
-            List<Category> cateList = categoryService.findAll();
-            req.setAttribute("cateList", cateList);
-            RequestDispatcher dispatcher = req.getRequestDispatcher("/views/admin/add-product.jsp");
-            dispatcher.forward(req, resp);
-        } else if (url.contains("/admin/product/edit")) {
-            String id = req.getParameter("id");
-            Product product = productService.findById(Integer.parseInt(id));
-            List<Category> cateList = categoryService.findAll();
-            req.setAttribute("product", product);
-            req.setAttribute("cateList", cateList);
-            RequestDispatcher dispatcher = req.getRequestDispatcher("/views/admin/edit-product.jsp");
-            dispatcher.forward(req, resp);
-        } else if (url.contains("/admin/product/delete")) {
-            String id = req.getParameter("id");
-            try {
-                productService.delete(Integer.parseInt(id));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            resp.sendRedirect(req.getContextPath() + "/admin/products");
+    @Autowired
+    private ICategoryService categoryService;
+
+    @GetMapping("/products")
+    public String listProducts(Model model) {
+        try {
+            List<Product> productList = productService.findAll();
+            model.addAttribute("productList", productList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Không thể hiển thị danh sách do lỗi CSDL: " + e.getMessage());
+        }
+        return "admin/list-product";
+    }
+
+    @GetMapping("/product/add")
+    public String addProductForm(Model model) {
+        List<Category> cateList = categoryService.findAll();
+        model.addAttribute("cateList", cateList);
+        return "admin/add-product";
+    }
+
+    @PostMapping("/product/insert")
+    public String insertProduct(
+            @RequestParam("productName") String productName,
+            @RequestParam(value = "description", required = false, defaultValue = "") String description,
+            @RequestParam("price") double price,
+            @RequestParam("categoryId") int categoryId,
+            @RequestParam("image") MultipartFile imageFile,
+            Model model) {
+
+        Category category = categoryService.findById(categoryId);
+        if (category == null) {
+            model.addAttribute("error", "Danh mục đã chọn không tồn tại!");
+            model.addAttribute("cateList", categoryService.findAll());
+            return "admin/add-product";
+        }
+
+        if (imageFile == null || imageFile.isEmpty()) {
+            model.addAttribute("error", "Vui lòng chọn hình ảnh đại diện cho sản phẩm!");
+            model.addAttribute("cateList", categoryService.findAll());
+            return "admin/add-product";
+        }
+
+        Product product = new Product();
+        product.setProductName(productName);
+        product.setDescription(description);
+        product.setPrice(price);
+        product.setCategory(category);
+        product.setCreatedDate(new Date(System.currentTimeMillis()));
+
+        try {
+            File dir = new File(Constant.DIR + "/product");
+            if (!dir.exists()) dir.mkdirs();
+
+            String originalFilename = imageFile.getOriginalFilename();
+            String ext = originalFilename != null && originalFilename.contains(".")
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".png";
+            String fname = System.currentTimeMillis() + ext;
+            imageFile.transferTo(new File(dir, fname));
+            product.setImage("product/" + fname);
+
+            productService.insert(product);
+            return "redirect:/admin/products?message=add_success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Lỗi khi lưu sản phẩm: " + e.getMessage());
+            model.addAttribute("cateList", categoryService.findAll());
+            return "admin/add-product";
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        String url = req.getRequestURI();
+    @GetMapping("/product/edit")
+    public String editProductForm(@RequestParam("id") int id, Model model) {
+        Product product = productService.findById(id);
+        if (product == null) {
+            return "redirect:/admin/products";
+        }
+        model.addAttribute("product", product);
+        model.addAttribute("cateList", categoryService.findAll());
+        return "admin/edit-product";
+    }
 
-        if (url.contains("/admin/product/insert")) {
-            String productName = req.getParameter("productName") != null ? req.getParameter("productName").trim() : "";
-            String description = req.getParameter("description") != null ? req.getParameter("description").trim() : "";
-            String priceStr = req.getParameter("price") != null ? req.getParameter("price").trim() : "";
-            String cateIdStr = req.getParameter("categoryId") != null ? req.getParameter("categoryId").trim() : "";
+    @PostMapping("/product/update")
+    public String updateProduct(
+            @RequestParam("productId") int productId,
+            @RequestParam("productName") String productName,
+            @RequestParam(value = "description", required = false, defaultValue = "") String description,
+            @RequestParam("price") double price,
+            @RequestParam("categoryId") int categoryId,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile,
+            Model model) {
 
-            // Server-side validation
-            if (productName.isEmpty() || productName.length() < 2 || productName.length() > 255) {
-                forwardWithAddError(req, resp, "Tên sản phẩm không hợp lệ (từ 2 đến 255 ký tự)!");
-                return;
-            }
+        Product product = productService.findById(productId);
+        if (product == null) {
+            return "redirect:/admin/products";
+        }
 
-            double price = 0;
+        Category category = categoryService.findById(categoryId);
+        if (category == null) {
+            model.addAttribute("error", "Danh mục đã chọn không hợp lệ!");
+            model.addAttribute("product", product);
+            model.addAttribute("cateList", categoryService.findAll());
+            return "admin/edit-product";
+        }
+
+        product.setProductName(productName);
+        product.setDescription(description);
+        product.setPrice(price);
+        product.setCategory(category);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
             try {
-                price = Double.parseDouble(priceStr);
-                if (price <= 0) {
-                    forwardWithAddError(req, resp, "Đơn giá sản phẩm phải lớn hơn 0!");
-                    return;
-                }
-            } catch (Exception e) {
-                forwardWithAddError(req, resp, "Đơn giá sản phẩm không hợp lệ!");
-                return;
-            }
-
-            int cateId = 0;
-            try {
-                cateId = Integer.parseInt(cateIdStr);
-            } catch (Exception e) {
-                forwardWithAddError(req, resp, "Vui lòng chọn một danh mục hợp lệ!");
-                return;
-            }
-
-            Category category = categoryService.findById(cateId);
-            if (category == null) {
-                forwardWithAddError(req, resp, "Danh mục đã chọn không tồn tại!");
-                return;
-            }
-
-            Part part = req.getPart("image");
-            if (part == null || part.getSize() == 0) {
-                forwardWithAddError(req, resp, "Vui lòng chọn hình ảnh đại diện cho sản phẩm!");
-                return;
-            }
-
-            String originalFileName = part.getSubmittedFileName();
-            String ext = "";
-            if (originalFileName != null && originalFileName.contains(".")) {
-                ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
-            }
-            if (!ext.matches("^(jpg|jpeg|png|webp|gif)$")) {
-                forwardWithAddError(req, resp, "Định dạng file ảnh không hợp lệ (chỉ chấp nhận JPG, PNG, WEBP, GIF)!");
-                return;
-            }
-
-            Product product = new Product();
-            try {
-                product.setProductName(productName);
-                product.setDescription(description);
-                product.setPrice(price);
-                product.setCategory(category);
-                product.setCreatedDate(new Date(System.currentTimeMillis()));
-
-                String fileName = System.currentTimeMillis() + "." + ext;
                 File dir = new File(Constant.DIR + "/product");
                 if (!dir.exists()) dir.mkdirs();
-                File file = new File(dir, fileName);
-                part.write(file.getAbsolutePath());
-                product.setImage("product/" + fileName);
 
-                productService.insert(product);
-                resp.sendRedirect(req.getContextPath() + "/admin/products?message=add_success");
-            } catch (Exception e) {
-                e.printStackTrace();
-                forwardWithAddError(req, resp, "Lỗi khi lưu sản phẩm vào hệ thống: " + e.getMessage());
-            }
-        } else if (url.contains("/admin/product/update")) {
-            String idStr = req.getParameter("productId");
-            String productName = req.getParameter("productName") != null ? req.getParameter("productName").trim() : "";
-            String description = req.getParameter("description") != null ? req.getParameter("description").trim() : "";
-            String priceStr = req.getParameter("price") != null ? req.getParameter("price").trim() : "";
-            String cateIdStr = req.getParameter("categoryId") != null ? req.getParameter("categoryId").trim() : "";
+                String originalFilename = imageFile.getOriginalFilename();
+                String ext = originalFilename != null && originalFilename.contains(".")
+                        ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                        : ".png";
+                String fname = System.currentTimeMillis() + ext;
+                imageFile.transferTo(new File(dir, fname));
 
-            int productId = 0;
-            try {
-                productId = Integer.parseInt(idStr);
-            } catch (Exception e) {
-                resp.sendRedirect(req.getContextPath() + "/admin/products");
-                return;
-            }
-
-            Product product = productService.findById(productId);
-            if (product == null) {
-                resp.sendRedirect(req.getContextPath() + "/admin/products");
-                return;
-            }
-
-            if (productName.isEmpty() || productName.length() < 2 || productName.length() > 255) {
-                forwardWithEditError(req, resp, product, "Tên sản phẩm không hợp lệ (từ 2 đến 255 ký tự)!");
-                return;
-            }
-
-            double price = 0;
-            try {
-                price = Double.parseDouble(priceStr);
-                if (price <= 0) {
-                    forwardWithEditError(req, resp, product, "Đơn giá sản phẩm phải lớn hơn 0!");
-                    return;
+                // Delete old image
+                if (product.getImage() != null && !product.getImage().isEmpty()) {
+                    File oldFile = new File(Constant.DIR + "/" + product.getImage());
+                    if (oldFile.exists()) oldFile.delete();
                 }
-            } catch (Exception e) {
-                forwardWithEditError(req, resp, product, "Đơn giá sản phẩm không hợp lệ!");
-                return;
-            }
-
-            int cateId = 0;
-            try {
-                cateId = Integer.parseInt(cateIdStr);
-            } catch (Exception e) {
-                forwardWithEditError(req, resp, product, "Vui lòng chọn một danh mục hợp lệ!");
-                return;
-            }
-
-            Category category = categoryService.findById(cateId);
-            if (category == null) {
-                forwardWithEditError(req, resp, product, "Danh mục đã chọn không tồn tại!");
-                return;
-            }
-
-            try {
-                product.setProductName(productName);
-                product.setDescription(description);
-                product.setPrice(price);
-                product.setCategory(category);
-
-                Part part = req.getPart("image");
-                if (part != null && part.getSize() > 0) {
-                    String originalFileName = part.getSubmittedFileName();
-                    String ext = "";
-                    if (originalFileName != null && originalFileName.contains(".")) {
-                        ext = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
-                    }
-                    if (!ext.matches("^(jpg|jpeg|png|webp|gif)$")) {
-                        forwardWithEditError(req, resp, product, "Định dạng file ảnh không hợp lệ (chỉ chấp nhận JPG, PNG, WEBP, GIF)!");
-                        return;
-                    }
-                    String fileName = System.currentTimeMillis() + "." + ext;
-                    File dir = new File(Constant.DIR + "/product");
-                    if (!dir.exists()) dir.mkdirs();
-                    File file = new File(dir, fileName);
-                    part.write(file.getAbsolutePath());
-                    product.setImage("product/" + fileName);
-                }
-
-                productService.update(product);
-                resp.sendRedirect(req.getContextPath() + "/admin/products?message=edit_success");
-            } catch (Exception e) {
+                product.setImage("product/" + fname);
+            } catch (IOException e) {
                 e.printStackTrace();
-                forwardWithEditError(req, resp, product, "Lỗi khi cập nhật sản phẩm: " + e.getMessage());
             }
+        }
+
+        try {
+            productService.update(product);
+            return "redirect:/admin/products?message=edit_success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "Lỗi khi cập nhật sản phẩm: " + e.getMessage());
+            model.addAttribute("product", product);
+            model.addAttribute("cateList", categoryService.findAll());
+            return "admin/edit-product";
         }
     }
 
-    private void forwardWithAddError(HttpServletRequest req, HttpServletResponse resp, String errorMsg)
-            throws ServletException, IOException {
-        req.setAttribute("error", errorMsg);
-        List<Category> cateList = categoryService.findAll();
-        req.setAttribute("cateList", cateList);
-        req.getRequestDispatcher("/views/admin/add-product.jsp").forward(req, resp);
-    }
-
-    private void forwardWithEditError(HttpServletRequest req, HttpServletResponse resp, Product product, String errorMsg)
-            throws ServletException, IOException {
-        req.setAttribute("error", errorMsg);
-        req.setAttribute("product", product);
-        List<Category> cateList = categoryService.findAll();
-        req.setAttribute("cateList", cateList);
-        req.getRequestDispatcher("/views/admin/edit-product.jsp").forward(req, resp);
+    @GetMapping("/product/delete")
+    public String deleteProduct(@RequestParam("id") int id) {
+        try {
+            productService.delete(id);
+            return "redirect:/admin/products?message=delete_success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/admin/products?message=delete_error";
+        }
     }
 }

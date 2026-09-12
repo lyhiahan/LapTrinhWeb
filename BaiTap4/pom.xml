@@ -4,74 +4,73 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.3.4</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
   <groupId>vn.iotstar</groupId>
   <artifactId>BaiTap4</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
-    <!-- Jakarta Servlet API (Tomcat 11 = Jakarta EE 10) -->
+    <!-- Spring Boot Starters -->
     <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <version>6.0.0</version>
-      <scope>provided</scope>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- JSTL cho Jakarta -->
     <dependency>
-      <groupId>org.glassfish.web</groupId>
-      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-      <version>3.0.1</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
+
+    <!-- Tomcat Embed Jasper cho biên dịch JSP -->
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-jasper</artifactId>
+    </dependency>
+
+    <!-- JSTL cho Jakarta EE (Tomcat 10/11) -->
     <dependency>
       <groupId>jakarta.servlet.jsp.jstl</groupId>
       <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
     </dependency>
 
-    <!-- SQL Server JDBC driver -->
+    <!-- SQL Server JDBC Driver -->
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
-      <version>12.6.1.jre11</version>
+      <scope>runtime</scope>
     </dependency>
 
-    <!-- Hibernate Core cho JPA 3.0 / Jakarta EE -->
+    <!-- SiteMesh 3 - Layout Decorator -->
     <dependency>
-      <groupId>org.hibernate.orm</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>6.6.1.Final</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <!-- Byte Buddy for Hibernate 6.x -->
-    <dependency>
-      <groupId>net.bytebuddy</groupId>
-      <artifactId>byte-buddy</artifactId>
-      <version>1.14.19</version>
+      <groupId>org.sitemesh</groupId>
+      <artifactId>sitemesh</artifactId>
+      <version>3.2.1</version>
     </dependency>
 
     <!-- Lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.32</version>
-      <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
 
-    <!-- Upload file - bản Jakarta Servlet 6 -->
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-fileupload2-jakarta-servlet6</artifactId>
-      <version>2.0.0-M4</version>
-    </dependency>
+    <!-- Commons IO -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -89,30 +88,26 @@
       <artifactId>angus-mail</artifactId>
       <version>2.0.2</version>
     </dependency>
-
-    <!-- SiteMesh 3 - Layout Decorator -->
-    <dependency>
-      <groupId>org.sitemesh</groupId>
-      <artifactId>sitemesh</artifactId>
-      <version>3.2.1</version>
-    </dependency>
   </dependencies>
 
   <build>
     <finalName>BaiTap4</finalName>
     <plugins>
       <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.4.0</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
-        <configuration>
-          <source>17</source>
-          <target>17</target>
-        </configuration>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.4.0</version>
       </plugin>
     </plugins>
   </build>

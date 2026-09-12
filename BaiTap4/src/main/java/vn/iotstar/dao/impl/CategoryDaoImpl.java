@@ -137,4 +137,47 @@ public class CategoryDaoImpl implements ICategoryDao {
             enma.close();
         }
     }
+
+    @Override
+    public List<Category> findPaginated(int page, int pageSize) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        String jpql = "SELECT c FROM Category c ORDER BY c.id DESC";
+        try {
+            TypedQuery<Category> query = enma.createQuery(jpql, Category.class);
+            query.setFirstResult((page - 1) * pageSize);
+            query.setMaxResults(pageSize);
+            return query.getResultList();
+        } finally {
+            enma.close();
+        }
+    }
+
+    @Override
+    public List<Category> searchPaginated(String keyword, int page, int pageSize) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        String jpql = "SELECT c FROM Category c WHERE c.name LIKE :keyword ORDER BY c.id DESC";
+        try {
+            TypedQuery<Category> query = enma.createQuery(jpql, Category.class);
+            query.setParameter("keyword", "%" + keyword + "%");
+            query.setFirstResult((page - 1) * pageSize);
+            query.setMaxResults(pageSize);
+            return query.getResultList();
+        } finally {
+            enma.close();
+        }
+    }
+
+    @Override
+    public int countSearch(String keyword) {
+        EntityManager enma = JPAConfig.getEntityManager();
+        String jpql = "SELECT COUNT(c) FROM Category c WHERE c.name LIKE :keyword";
+        try {
+            Query query = enma.createQuery(jpql);
+            query.setParameter("keyword", "%" + keyword + "%");
+            return ((Long) query.getSingleResult()).intValue();
+        } finally {
+            enma.close();
+        }
+    }
 }
+

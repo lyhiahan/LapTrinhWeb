@@ -8,7 +8,11 @@ import vn.iotstar.dao.impl.ProductDaoImpl;
 import vn.iotstar.entity.Product;
 import vn.iotstar.service.IProductService;
 import vn.iotstar.util.Constant;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional
 public class ProductServiceImpl implements IProductService {
 
     IProductDao productDao = new ProductDaoImpl();
