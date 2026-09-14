@@ -66,9 +66,8 @@
                             <td class="text-center fw-semibold text-muted" th:text="${product.productId}">1</td>
                             <td class="text-center">
                                 <th:block th:if="${product.image != null and !#strings.isEmpty(product.image)}">
-                                    <img th:if="${#strings.startsWith(product.image, 'http')}"
-                                        th:src="${product.image}" class="product-image-preview"
-                                        alt="Product Image"
+                                    <img th:if="${#strings.startsWith(product.image, 'http')}" th:src="${product.image}"
+                                        class="product-image-preview" alt="Product Image"
                                         onerror="this.onerror=null; this.src='https://placehold.co/100x100?text=No+Image'" />
                                     <img th:unless="${#strings.startsWith(product.image, 'http')}"
                                         th:src="@{${#strings.startsWith(product.image, '/upload/') ? product.image : (#strings.startsWith(product.image, 'upload/') ? ('/' + product.image) : (#strings.startsWith(product.image, 'product/') ? ('/upload/' + product.image) : ('/upload/product/' + product.image)))}}"
