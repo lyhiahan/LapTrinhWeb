@@ -81,12 +81,9 @@
                 <div class="d-flex align-items-center gap-2">
                     <span class="small text-muted d-none d-sm-inline">Hiển thị:</span>
                     <select class="form-select form-select-sm" style="width: auto;" onchange="location = this.value;">
-                        <option th:value="@{/admin/categories(name=${name}, size=5)}" th:selected="${pageSize == 5}">5
-                            dòng</option>
-                        <option th:value="@{/admin/categories(name=${name}, size=10)}" th:selected="${pageSize == 10}">
-                            10 dòng</option>
-                        <option th:value="@{/admin/categories(name=${name}, size=20)}" th:selected="${pageSize == 20}">
-                            20 dòng</option>
+                        <option th:value="@{/admin/categories(name=${name}, size=10)}" th:selected="${pageSize == 10}">10 dòng</option>
+                        <option th:value="@{/admin/categories(name=${name}, size=5)}" th:selected="${pageSize == 5}">5 dòng</option>
+                        <option th:value="@{/admin/categories(name=${name}, size=20)}" th:selected="${pageSize == 20}">20 dòng</option>
                     </select>
                 </div>
             </div>

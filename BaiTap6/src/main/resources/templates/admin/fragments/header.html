@@ -4,7 +4,7 @@
 <body>
     <header th:fragment="header" class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
-            <a class="navbar-brand" th:href="@{/admin/categories}">
+            <a class="navbar-brand" href="/admin/categories" th:href="@{/admin/categories}">
                 <i class="fas fa-layer-group"></i>
                 <span>Shop<b>Admin</b></span>
             </a>
@@ -17,38 +17,38 @@
             <div class="collapse navbar-collapse" id="navbarAdmin">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
                     <li class="nav-item">
-                        <a class="nav-link fw-medium text-dark" th:href="@{/admin/categories}">
+                        <a class="nav-link fw-medium text-dark" href="/admin/categories" th:href="@{/admin/categories}">
                             <i class="fas fa-list text-primary me-1"></i>
                             <span th:text="#{iotstar.value.listCate}">Danh sách danh mục</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-medium text-dark" th:href="@{/admin/categories/add}">
+                        <a class="nav-link fw-medium text-dark" href="/admin/categories/add" th:href="@{/admin/categories/add}">
                             <i class="fas fa-plus-circle text-success me-1"></i>
                             <span th:text="#{iotstar.value.addCate}">Thêm danh mục</span>
                         </a>
                     </li>
                 </ul>
 
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3 ms-auto flex-nowrap">
                     <div class="btn-group btn-group-sm" role="group">
-                        <a th:href="@{''(language='vi_VN')}"
+                        <a href="/admin/categories?language=vi" th:href="@{/admin/categories(language='vi')}"
                             class="btn btn-outline-secondary d-flex align-items-center gap-1" title="Tiếng Việt">
                             <span>🇻🇳</span> <span class="d-none d-md-inline" th:text="#{iotstar.value.langVi}">Tiếng
                                 Việt</span>
                         </a>
-                        <a th:href="@{''(language='en')}"
+                        <a href="/admin/categories?language=en" th:href="@{/admin/categories(language='en')}"
                             class="btn btn-outline-secondary d-flex align-items-center gap-1" title="English">
                             <span>🇬🇧</span> <span class="d-none d-md-inline"
                                 th:text="#{iotstar.value.langEn}">English</span>
                         </a>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2 ps-2 border-start">
+                    <div class="d-flex align-items-center gap-2 ps-2 border-start flex-nowrap">
                         <img th:src="@{/upload/avatar/1788885098704.jpg}"
-                            onerror="this.onerror=null; this.src='/images/myself.jpg';"
-                            alt="Lý Gia Hân" class="student-avatar" />
-                        <div class="d-flex flex-column">
+                            onerror="this.onerror=null; this.src='/images/myself.jpg';" alt="Lý Gia Hân"
+                            class="student-avatar" />
+                        <div class="d-flex flex-column text-nowrap">
                             <div class="d-flex align-items-center gap-1">
                                 <strong class="text-dark small" style="font-size: 0.9rem;">Lý Gia Hân</strong>
                                 <span class="student-badge">MSSV: 24133016</span>

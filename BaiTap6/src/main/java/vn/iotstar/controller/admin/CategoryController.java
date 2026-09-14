@@ -49,7 +49,7 @@ public class CategoryController {
             ModelMap model) {
 
         int currentPage = page.orElse(1);
-        int pageSize = size.orElse(5);
+        int pageSize = size.orElse(10);
         if (currentPage < 1) {
             currentPage = 1;
         }
