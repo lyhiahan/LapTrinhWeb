@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{admin/layout_admin.html}">
+
+<head>
+    <title th:text="${isEdit} ? #{iotstar.value.editCate} : #{iotstar.value.addCate}">Thêm hoặc Sửa Danh Mục</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1 small">
+                    <li class="breadcrumb-item"><a th:href="@{/admin/categories}" class="text-decoration-none">Admin</a>
+                    </li>
+                    <li class="breadcrumb-item"><a th:href="@{/admin/categories}" class="text-decoration-none"
+                            th:text="#{iotstar.value.listCate}">Danh mục</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"
+                        th:text="${isEdit} ? #{iotstar.value.editCate} : #{iotstar.value.addCate}">Thao tác</li>
+                </ol>
+            </nav>
+            <h3 class="fw-bold mb-0 text-dark">
+                <i
+                    th:class="${isEdit} ? 'fas fa-pen-to-square text-primary me-2' : 'fas fa-plus-circle text-success me-2'"></i>
+                <span th:text="${isEdit} ? #{iotstar.value.editCate} : #{iotstar.value.addCate}">Thêm mới / Chỉnh
+                    sửa</span>
+            </h3>
+        </div>
+
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show shadow-sm mb-4"
+            role="alert">
+            <i class="fas fa-circle-exclamation me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card card-custom">
+                    <div class="card-header-custom d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark">
+                            <i class="fas fa-file-pen text-primary me-2"></i>
+                            <span
+                                th:text="${isEdit} ? 'Cập nhật thông tin danh mục #' + ${category.id} : 'Điền thông tin danh mục mới'"></span>
+                        </span>
+                        <a th:href="@{/admin/categories}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            <span th:text="#{iotstar.value.back}">Quay lại</span>
+                        </a>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <form th:action="@{/admin/categories/saveOrUpdate}" th:object="${category}" method="post"
+                            enctype="multipart/form-data" class="needs-validation">
+
+                            <input type="hidden" th:field="*{id}" />
+                            <input type="hidden" th:field="*{icon}" />
+
+                            <div class="mb-3">
+                                <label for="categoryName" class="form-label fw-semibold">
+                                    <span th:text="#{iotstar.value.cateName}">Tên danh mục</span>
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="fas fa-tag text-muted"></i></span>
+                                    <input type="text" class="form-control" id="categoryName" th:field="*{name}"
+                                        placeholder="Ví dụ: Thiết bị điện tử, Thời trang nữ..." required
+                                        minlength="2" />
+                                </div>
+                                <div class="form-text">Tên danh mục phải có độ dài ít nhất 2 ký tự.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="categoryPrice" class="form-label fw-semibold">
+                                    <span th:text="#{iotstar.value.catePrice}">Đơn giá tham chiếu</span> (VNĐ)
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i
+                                            class="fas fa-money-bill-wave text-muted"></i></span>
+                                    <input type="number" class="form-control" id="categoryPrice" th:field="*{price}"
+                                        min="0" step="1000" placeholder="Ví dụ: 50000" />
+                                    <span class="input-group-text bg-light">VNĐ</span>
+                                </div>
+                                <div class="form-text">Đơn giá cơ bản hoặc mức giá trung bình của danh mục.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="iconFile" class="form-label fw-semibold">
+                                    <span th:text="#{iotstar.value.cateIcon}">Hình ảnh / Biểu tượng</span>
+                                </label>
+                                <input type="file" class="form-control" id="iconFile" name="iconFile" accept="image/*"
+                                    onchange="previewUploadedImage(event)" />
+                                <div class="form-text">Chọn ảnh định dạng JPG, PNG, WEBP (Tối đa 10MB).</div>
+
+                                <div class="mt-3 p-3 bg-light rounded border text-center">
+                                    <div class="small text-muted mb-2">Xem trước hình ảnh:</div>
+                                    <div class="d-inline-block position-relative">
+                                        <img id="imagePreview"
+                                            th:if="${category.icon != null and !#strings.isEmpty(category.icon)}"
+                                            th:src="${#strings.startsWith(category.icon, 'http')} ? ${category.icon} : @{'/upload/' + ${category.icon}}"
+                                            class="rounded shadow-sm border"
+                                            style="max-width: 140px; max-height: 140px; object-fit: cover;"
+                                            alt="Xem trước ảnh" />
+                                        <img id="imagePreview"
+                                            th:unless="${category.icon != null and !#strings.isEmpty(category.icon)}"
+                                            src="https://placehold.co/140x140?text=Chưa+chọn+ảnh"
+                                            class="rounded shadow-sm border"
+                                            style="max-width: 140px; max-height: 140px; object-fit: cover;"
+                                            alt="Xem trước ảnh" />
+                                    </div>
+                                    <div th:if="${category.icon != null and !#strings.isEmpty(category.icon)}"
+                                        class="small text-muted mt-1">
+                                        Ảnh hiện tại: <code th:text="${category.icon}"></code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4" />
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/admin/categories}" class="btn btn-outline-secondary px-4">
+                                    <i class="fas fa-xmark me-1"></i>
+                                    <span th:text="#{iotstar.value.cancel}">Hủy bỏ</span>
+                                </a>
+                                <button type="reset" class="btn btn-light border px-3">
+                                    <i class="fas fa-rotate-left me-1"></i>
+                                    <span th:text="#{iotstar.value.reset}">Nhập lại</span>
+                                </button>
+                                <button type="submit" class="btn btn-gradient-primary px-4">
+                                    <i class="fas fa-floppy-disk me-1"></i>
+                                    <span th:text="${isEdit} ? #{iotstar.value.update} : #{iotstar.value.save}">Lưu dữ
+                                        liệu</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            function previewUploadedImage(event) {
+                var input = event.target;
+                var preview = document.getElementById('imagePreview');
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
+    </th:block>
+</body>
+
+</html>

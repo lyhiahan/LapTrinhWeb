@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{admin/layout_admin.html}">
+
+<head>
+    <title th:text="#{iotstar.value.listCate}">Danh Sách Danh Mục</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/categories}"
+                                class="text-decoration-none">Admin</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="#{iotstar.value.manageCate}">
+                            Quản lý Danh mục</li>
+                    </ol>
+                </nav>
+                <h3 class="fw-bold mb-0 text-dark">
+                    <i class="fas fa-layer-group text-primary me-2"></i>
+                    <span th:text="#{iotstar.value.listCate}">Danh Sách Danh Mục</span>
+                </h3>
+            </div>
+            <div>
+                <a th:href="@{/admin/categories/add}" class="btn btn-gradient-primary rounded-pill px-4 py-2">
+                    <i class="fas fa-plus me-1"></i>
+                    <span th:text="#{iotstar.value.addCate}">Thêm mới danh mục</span>
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${message != null}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-circle-check me-2"></i>
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error != null}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-circle-exclamation me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card card-custom mb-4">
+            <div class="card-body p-3 p-md-4">
+                <form th:action="@{/admin/categories}" method="get" class="row g-3 align-items-center">
+                    <input type="hidden" name="size" th:value="${pageSize}" />
+                    <div class="col-md-7 col-lg-8">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" name="name" class="form-control border-start-0 ps-0"
+                                th:placeholder="#{iotstar.value.searchPlaceholder}" th:value="${name}" />
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-lg-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-3 flex-grow-1">
+                            <i class="fas fa-filter me-1"></i>
+                            <span th:text="#{iotstar.value.search}">Tìm kiếm</span>
+                        </button>
+                        <a th:href="@{/admin/categories}" class="btn btn-outline-secondary px-3">
+                            <i class="fas fa-rotate-left me-1"></i>
+                            <span th:text="#{iotstar.value.reset}">Làm mới</span>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <div class="fw-bold text-dark">
+                    <i class="fas fa-table-list text-primary me-2"></i>
+                    <span th:text="#{iotstar.value.listCate}">Danh sách danh mục</span>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill ms-2"
+                        th:text="${totalElements} + ' danh mục'">0 danh mục</span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="small text-muted d-none d-sm-inline">Hiển thị:</span>
+                    <select class="form-select form-select-sm" style="width: auto;" onchange="location = this.value;">
+                        <option th:value="@{/admin/categories(name=${name}, size=5)}" th:selected="${pageSize == 5}">5
+                            dòng</option>
+                        <option th:value="@{/admin/categories(name=${name}, size=10)}" th:selected="${pageSize == 10}">
+                            10 dòng</option>
+                        <option th:value="@{/admin/categories(name=${name}, size=20)}" th:selected="${pageSize == 20}">
+                            20 dòng</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-custom">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 70px;" th:text="#{iotstar.value.cateId}">Mã ID</th>
+                            <th class="text-center" style="width: 100px;" th:text="#{iotstar.value.cateIcon}">Hình ảnh
+                            </th>
+                            <th th:text="#{iotstar.value.cateName}">Tên danh mục</th>
+                            <th th:text="#{iotstar.value.catePrice}">Đơn giá</th>
+                            <th class="text-center" style="width: 160px;" th:text="#{iotstar.value.action}">Hành động
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="category : ${categoryPage.content}">
+                            <td class="text-center fw-semibold text-muted" th:text="${category.id}">1</td>
+                            <td class="text-center">
+                                <th:block th:if="${category.icon != null and !#strings.isEmpty(category.icon)}">
+                                    <img th:if="${#strings.startsWith(category.icon, 'http')}" th:src="${category.icon}"
+                                        class="category-icon-preview" alt="Category Icon" />
+                                    <img th:unless="${#strings.startsWith(category.icon, 'http')}"
+                                        th:src="@{'/upload/' + ${category.icon}}" class="category-icon-preview"
+                                        alt="Category Icon"
+                                        onerror="this.src='https://placehold.co/100x100?text=No+Icon'" />
+                                </th:block>
+                                <span th:if="${category.icon == null or #strings.isEmpty(category.icon)}"
+                                    class="badge bg-light text-secondary border">
+                                    <i class="fas fa-image"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <strong class="text-dark" th:text="${category.name}">Tên danh mục</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1"
+                                    th:text="${#numbers.formatDecimal(category.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                    0 đ
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a th:href="@{'/admin/categories/edit/' + ${category.id}}"
+                                        class="btn btn-outline-primary" title="Chỉnh sửa">
+                                        <i class="fas fa-pen-to-square me-1"></i>
+                                        <span th:text="#{iotstar.value.edit}">Sửa</span>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger"
+                                        th:attr="data-id=${category.id}, data-name=${category.name}"
+                                        onclick="confirmDeleteCategory(this.getAttribute('data-id'), this.getAttribute('data-name'))"
+                                        title="Xóa danh mục">
+                                        <i class="fas fa-trash-can me-1"></i>
+                                        <span th:text="#{iotstar.value.delete}">Xóa</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${categoryPage.totalElements == 0}">
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-3 text-secondary opacity-50"></i>
+                                <h5 class="fw-normal" th:text="#{iotstar.value.noData}">Không tìm thấy danh mục nào!
+                                </h5>
+                                <a th:href="@{/admin/categories/add}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="fas fa-plus me-1"></i> Thêm danh mục mới ngay
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div th:if="${totalPages > 1}" class="card-footer bg-white border-top p-3">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                    <div class="small text-muted">
+                        <span th:text="#{iotstar.value.page}">Trang</span>
+                        <strong th:text="${currentPage}">1</strong>
+                        <span th:text="#{iotstar.value.of}">trên</span>
+                        <strong th:text="${totalPages}">1</strong>
+                        (Tổng số <span th:text="${totalElements}">0</span> bản ghi)
+                    </div>
+
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/categories(name=${name}, size=${pageSize}, page=1)}"
+                                    aria-label="Đầu">
+                                    <i class="fas fa-angles-left"></i>
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/categories(name=${name}, size=${pageSize}, page=${currentPage - 1})}"
+                                    aria-label="Trước">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:each="pageNum : ${pageNumbers}"
+                                th:classappend="${pageNum == currentPage} ? 'active'">
+                                <a class="page-link"
+                                    th:href="@{/admin/categories(name=${name}, size=${pageSize}, page=${pageNum})}"
+                                    th:text="${pageNum}">1</a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/categories(name=${name}, size=${pageSize}, page=${currentPage + 1})}"
+                                    aria-label="Sau">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/categories(name=${name}, size=${pageSize}, page=${totalPages})}"
+                                    aria-label="Cuối">
+                                    <i class="fas fa-angles-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteModalLabel">
+                            <i class="fas fa-triangle-exclamation me-2"></i> Xác nhận xóa
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 text-center">
+                        <i class="fas fa-trash-can text-danger fa-3x mb-3"></i>
+                        <p class="mb-2" th:text="#{iotstar.value.confirmDelete}">Bạn có chắc chắn muốn xóa danh mục này
+                            không?</p>
+                        <h6 class="fw-bold text-dark" id="categoryNameToDelete">Tên danh mục</h6>
+                        <small class="text-muted">Lưu ý: Hành động này không thể hoàn tác!</small>
+                    </div>
+                    <div class="modal-footer bg-light justify-content-center">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal"
+                            th:text="#{iotstar.value.cancel}">Hủy bỏ</button>
+                        <a id="confirmDeleteLink" href="#" class="btn btn-danger rounded-pill px-4"
+                            th:text="#{iotstar.value.delete}">Xóa ngay</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            function confirmDeleteCategory(id, name) {
+                document.getElementById('categoryNameToDelete').textContent = name;
+                document.getElementById('confirmDeleteLink').setAttribute('href', '/admin/categories/delete/' + id);
+                var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
+            }
+        </script>
+    </th:block>
+</body>
+
+</html>
