@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import vn.iotstar.entity.Category;
+import vn.iotstar.entity.Product;
+import vn.iotstar.repository.ProductRepository;
 import vn.iotstar.service.ICategoryService;
 import vn.iotstar.util.Constant;
 
@@ -35,6 +37,9 @@ public class CategoryController {
 
     @Autowired
     private ICategoryService categoryService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @GetMapping({ "", "/searchpaginated" })
     public String searchAndPaginate(
@@ -166,6 +171,26 @@ public class CategoryController {
             model.addAttribute("isEdit", category.getId() > 0);
             return "admin/categories/addOrEdit";
         }
+    }
+
+    @GetMapping({"/{id}/products", "/products"})
+    public String viewCategoryProducts(
+            @PathVariable(name = "id", required = false) Integer pathId,
+            @RequestParam(name = "id", required = false) Integer paramId,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        int id = pathId != null ? pathId : (paramId != null ? paramId : 0);
+        Category category = categoryService.findById(id);
+        if (category == null) {
+            redirectAttributes.addFlashAttribute("error", "Danh mục không tồn tại!");
+            return "redirect:/admin/categories";
+        }
+
+        List<Product> products = productRepository.findByCategory_Id(id);
+        model.addAttribute("category", category);
+        model.addAttribute("products", products);
+        return "admin/categories/products";
     }
 
     @GetMapping("/delete/{id}")

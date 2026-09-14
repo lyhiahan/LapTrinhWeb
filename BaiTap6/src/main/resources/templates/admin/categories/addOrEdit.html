@@ -70,20 +70,6 @@
                                 <div class="form-text">Tên danh mục phải có độ dài ít nhất 2 ký tự.</div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="categoryPrice" class="form-label fw-semibold">
-                                    <span th:text="#{iotstar.value.catePrice}">Đơn giá tham chiếu</span> (VNĐ)
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light"><i
-                                            class="fas fa-money-bill-wave text-muted"></i></span>
-                                    <input type="number" class="form-control" id="categoryPrice" th:field="*{price}"
-                                        min="0" step="1000" placeholder="Ví dụ: 50000" />
-                                    <span class="input-group-text bg-light">VNĐ</span>
-                                </div>
-                                <div class="form-text">Đơn giá cơ bản hoặc mức giá trung bình của danh mục.</div>
-                            </div>
-
                             <div class="mb-4">
                                 <label for="iconFile" class="form-label fw-semibold">
                                     <span th:text="#{iotstar.value.cateIcon}">Hình ảnh / Biểu tượng</span>
@@ -97,13 +83,11 @@
                                     <div class="d-inline-block position-relative">
                                         <img id="imagePreview"
                                             th:if="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}"
-                                            th:src="@{'/upload/' + ${category.icon}}"
-                                            class="rounded shadow-sm border"
+                                            th:src="@{'/upload/' + ${category.icon}}" class="rounded shadow-sm border"
                                             style="max-width: 140px; max-height: 140px; object-fit: cover;"
                                             alt="Xem trước ảnh"
                                             onerror="this.style.display='none'; document.getElementById('iconBadgePreview').style.display='inline-flex';" />
-                                        <div id="iconBadgePreview"
-                                            class="category-icon-badge fs-1"
+                                        <div id="iconBadgePreview" class="category-icon-badge fs-1"
                                             th:classappend="${category.autoBgColor}"
                                             th:style="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')} ? 'display: none; width: 80px; height: 80px;' : 'display: inline-flex; width: 80px; height: 80px;'">
                                             <i th:class="${category.autoIcon}"></i>

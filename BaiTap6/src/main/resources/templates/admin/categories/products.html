@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout_admin.html}">
+<head>
+    <title th:text="'Sản Phẩm - ' + ${category.name}">Sản Phẩm Thuộc Danh Mục</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/categories}" class="text-decoration-none">Admin</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/categories}" class="text-decoration-none" th:text="#{iotstar.value.listCate}">Danh mục</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${category.name}">Tên danh mục</li>
+                    </ol>
+                </nav>
+                <div class="d-flex align-items-center gap-3 mt-2">
+                    <div class="category-icon-badge fs-3" th:classappend="${category.autoBgColor}" style="width: 52px; height: 52px;">
+                        <i th:class="${category.autoIcon}"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0 text-dark" th:text="${category.name}">Tên danh mục</h3>
+                        <small class="text-muted">Danh sách tất cả sản phẩm con thuộc danh mục này</small>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a th:href="@{/admin/categories}" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    <span th:text="#{iotstar.value.back}">Quay lại danh sách</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="card card-custom">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <div class="fw-bold text-dark">
+                    <i class="fas fa-boxes-stacked text-primary me-2"></i>
+                    <span>Sản phẩm trong danh mục</span>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill ms-2"
+                          th:text="${products != null ? products.size() : 0} + ' sản phẩm'">0 sản phẩm</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-custom">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 70px;">Mã SP</th>
+                            <th class="text-center" style="width: 100px;">Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Đơn giá</th>
+                            <th>Ngày cập nhật</th>
+                            <th>Mô tả</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="product : ${products}">
+                            <td class="text-center fw-semibold text-muted" th:text="${product.productId}">1</td>
+                            <td class="text-center">
+                                <th:block th:if="${product.image != null and !#strings.isEmpty(product.image)}">
+                                    <img th:if="${#strings.startsWith(product.image, 'http')}"
+                                         th:src="${product.image}"
+                                         class="category-icon-preview"
+                                         alt="Product Image"
+                                         onerror="this.src='https://placehold.co/100x100?text=No+Image'"/>
+                                    <img th:unless="${#strings.startsWith(product.image, 'http')}"
+                                         th:src="@{'/upload/' + ${product.image}}"
+                                         class="category-icon-preview"
+                                         alt="Product Image"
+                                         onerror="this.src='https://placehold.co/100x100?text=No+Image'"/>
+                                </th:block>
+                                <span th:if="${product.image == null or #strings.isEmpty(product.image)}"
+                                      class="badge bg-light text-secondary border">
+                                    <i class="fas fa-image"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <strong class="text-dark" th:text="${product.productName}">Tên sản phẩm</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 fw-bold"
+                                      th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                                    0 đ
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-muted small"
+                                      th:text="${product.createdDate != null ? #dates.format(product.createdDate, 'dd/MM/yyyy') : 'Chưa có'}">
+                                    01/01/2026
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-muted small text-truncate d-inline-block" style="max-width: 250px;"
+                                      th:text="${product.description != null ? product.description : 'Không có mô tả'}">
+                                    Mô tả
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${products == null or products.isEmpty()}">
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-box-open fa-3x mb-3 text-secondary opacity-50"></i>
+                                <h5 class="fw-normal">Danh mục này hiện chưa có sản phẩm con nào!</h5>
+                                <a th:href="@{/admin/categories}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách danh mục
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

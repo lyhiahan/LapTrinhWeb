@@ -1,12 +1,17 @@
 package vn.iotstar.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,6 +33,9 @@ public class Category implements Serializable {
 
     @Column(name = "price")
     private double price;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Product> products = new ArrayList<>();
 
     public Category() {
     }
@@ -71,24 +79,36 @@ public class Category implements Serializable {
         this.price = price;
     }
 
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
     public String getAutoIcon() {
         if (name == null) {
             return "fas fa-layer-group";
         }
         String lower = name.toLowerCase();
-        if (lower.contains("trang sức") || lower.contains("nhẫn") || lower.contains("vòng") || lower.contains("dây chuyền") || lower.contains("kim cương")) {
+        if (lower.contains("trang sức") || lower.contains("nhẫn") || lower.contains("vòng")
+                || lower.contains("dây chuyền") || lower.contains("kim cương")) {
             return "fas fa-gem text-warning";
         }
         if (lower.contains("giày") || lower.contains("dép") || lower.contains("sandal") || lower.contains("sneaker")) {
             return "fas fa-shoe-prints text-danger";
         }
-        if (lower.contains("điện thoại") || lower.contains("phone") || lower.contains("smartphone") || lower.contains("mobile")) {
+        if (lower.contains("điện thoại") || lower.contains("phone") || lower.contains("smartphone")
+                || lower.contains("mobile")) {
             return "fas fa-mobile-screen-button text-primary";
         }
-        if (lower.contains("laptop") || lower.contains("máy tính") || lower.contains("pc") || lower.contains("macbook")) {
+        if (lower.contains("laptop") || lower.contains("máy tính") || lower.contains("pc")
+                || lower.contains("macbook")) {
             return "fas fa-laptop text-info";
         }
-        if (lower.contains("quần") || lower.contains("áo") || lower.contains("thời trang") || lower.contains("váy") || lower.contains("đầm")) {
+        if (lower.contains("quần") || lower.contains("áo") || lower.contains("thời trang") || lower.contains("váy")
+                || lower.contains("đầm")) {
             return "fas fa-shirt text-success";
         }
         if (lower.contains("đồng hồ") || lower.contains("watch")) {

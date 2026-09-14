@@ -99,8 +99,7 @@
                             <th class="text-center" style="width: 100px;" th:text="#{iotstar.value.cateIcon}">Hình ảnh
                             </th>
                             <th th:text="#{iotstar.value.cateName}">Tên danh mục</th>
-                            <th th:text="#{iotstar.value.catePrice}">Đơn giá</th>
-                            <th class="text-center" style="width: 160px;" th:text="#{iotstar.value.action}">Hành động
+                            <th class="text-center" style="width: 220px;" th:text="#{iotstar.value.action}">Hành động
                             </th>
                         </tr>
                     </thead>
@@ -108,35 +107,38 @@
                         <tr th:each="category : ${categoryPage.content}">
                             <td class="text-center fw-semibold text-muted" th:text="${category.id}">1</td>
                             <td class="text-center">
-                                <th:block th:if="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}">
-                                    <img th:src="@{'/upload/' + ${category.icon}}"
-                                         class="category-icon-preview"
-                                         alt="Category Icon"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"/>
-                                    <div class="category-icon-badge"
-                                         th:classappend="${category.autoBgColor}"
-                                         style="display: none;">
+                                <th:block
+                                    th:if="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}">
+                                    <img th:src="@{'/upload/' + ${category.icon}}" class="category-icon-preview"
+                                        alt="Category Icon"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';" />
+                                    <div class="category-icon-badge" th:classappend="${category.autoBgColor}"
+                                        style="display: none;">
                                         <i th:class="${category.autoIcon}"></i>
                                     </div>
                                 </th:block>
-                                <th:block th:unless="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}">
-                                    <div class="category-icon-badge"
-                                         th:classappend="${category.autoBgColor}">
+                                <th:block
+                                    th:unless="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}">
+                                    <div class="category-icon-badge" th:classappend="${category.autoBgColor}">
                                         <i th:class="${category.autoIcon}"></i>
                                     </div>
                                 </th:block>
                             </td>
                             <td>
-                                <strong class="text-dark" th:text="${category.name}">Tên danh mục</strong>
-                            </td>
-                            <td>
-                                <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1"
-                                    th:text="${#numbers.formatDecimal(category.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">
-                                    0 đ
-                                </span>
+                                <a th:href="@{'/admin/categories/' + ${category.id} + '/products'}"
+                                    class="text-decoration-none fw-bold text-dark d-inline-flex align-items-center gap-2"
+                                    title="Xem danh sách sản phẩm thuộc danh mục này">
+                                    <span th:text="${category.name}">Tên danh mục</span>
+                                    <i class="fas fa-boxes-stacked text-primary small"></i>
+                                </a>
                             </td>
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm" role="group">
+                                    <a th:href="@{'/admin/categories/' + ${category.id} + '/products'}"
+                                        class="btn btn-outline-info" title="Xem sản phẩm">
+                                        <i class="fas fa-boxes-stacked me-1"></i>
+                                        <span>Sản phẩm</span>
+                                    </a>
                                     <a th:href="@{'/admin/categories/edit/' + ${category.id}}"
                                         class="btn btn-outline-primary" title="Chỉnh sửa">
                                         <i class="fas fa-pen-to-square me-1"></i>
@@ -154,7 +156,7 @@
                         </tr>
 
                         <tr th:if="${categoryPage.totalElements == 0}">
-                            <td colspan="5" class="text-center py-5 text-muted">
+                            <td colspan="4" class="text-center py-5 text-muted">
                                 <i class="fas fa-folder-open fa-3x mb-3 text-secondary opacity-50"></i>
                                 <h5 class="fw-normal" th:text="#{iotstar.value.noData}">Không tìm thấy danh mục nào!
                                 </h5>
