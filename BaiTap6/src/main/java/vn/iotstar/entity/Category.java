@@ -107,8 +107,12 @@ public class Category implements Serializable {
                 || lower.contains("macbook")) {
             return "fas fa-laptop text-info";
         }
-        if (lower.contains("quần") || lower.contains("áo") || lower.contains("thời trang") || lower.contains("váy")
-                || lower.contains("đầm")) {
+        if (lower.contains("quần") || lower.contains("jean") || lower.contains("kaki") || lower.contains("trousers")
+                || lower.contains("pants") || lower.contains("short")) {
+            return "fa-pants text-primary";
+        }
+        if (lower.contains("áo") || lower.contains("ao ") || lower.startsWith("ao") || lower.contains("thời trang")
+                || lower.contains("váy") || lower.contains("đầm")) {
             return "fas fa-shirt text-success";
         }
         if (lower.contains("đồng hồ") || lower.contains("watch")) {
@@ -152,7 +156,11 @@ public class Category implements Serializable {
         if (lower.contains("laptop") || lower.contains("máy tính")) {
             return "bg-info-subtle";
         }
-        if (lower.contains("quần") || lower.contains("áo") || lower.contains("thời trang")) {
+        if (lower.contains("quần") || lower.contains("jean") || lower.contains("kaki") || lower.contains("trousers")
+                || lower.contains("pants") || lower.contains("short")) {
+            return "bg-primary-subtle";
+        }
+        if (lower.contains("áo") || lower.contains("thời trang") || lower.contains("váy") || lower.contains("đầm")) {
             return "bg-success-subtle";
         }
         if (lower.contains("đồng hồ")) {

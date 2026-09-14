@@ -173,7 +173,7 @@ public class CategoryController {
         }
     }
 
-    @GetMapping({"/{id}/products", "/products"})
+    @GetMapping({ "/{id}/products", "/products" })
     public String viewCategoryProducts(
             @PathVariable(name = "id", required = false) Integer pathId,
             @RequestParam(name = "id", required = false) Integer paramId,

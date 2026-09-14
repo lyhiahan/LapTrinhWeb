@@ -1,8 +1,9 @@
-# Ignore target and build files
 target/
 .settings/
 .classpath
 .project
 .factorypath
-upload/
+/upload/
+!BaiTap6/upload/product/
+!BaiTap6/src/main/resources/static/upload/
 .vscode/
