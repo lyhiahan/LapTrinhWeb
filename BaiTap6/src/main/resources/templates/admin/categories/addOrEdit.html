@@ -93,22 +93,23 @@
                                 <div class="form-text">Chọn ảnh định dạng JPG, PNG, WEBP (Tối đa 10MB).</div>
 
                                 <div class="mt-3 p-3 bg-light rounded border text-center">
-                                    <div class="small text-muted mb-2">Xem trước hình ảnh:</div>
+                                    <div class="small text-muted mb-2">Xem trước hình ảnh / biểu tượng:</div>
                                     <div class="d-inline-block position-relative">
                                         <img id="imagePreview"
-                                            th:if="${category.icon != null and !#strings.isEmpty(category.icon)}"
-                                            th:src="${#strings.startsWith(category.icon, 'http')} ? ${category.icon} : @{'/upload/' + ${category.icon}}"
+                                            th:if="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}"
+                                            th:src="@{'/upload/' + ${category.icon}}"
                                             class="rounded shadow-sm border"
                                             style="max-width: 140px; max-height: 140px; object-fit: cover;"
-                                            alt="Xem trước ảnh" />
-                                        <img id="imagePreview"
-                                            th:unless="${category.icon != null and !#strings.isEmpty(category.icon)}"
-                                            src="https://placehold.co/140x140?text=Chưa+chọn+ảnh"
-                                            class="rounded shadow-sm border"
-                                            style="max-width: 140px; max-height: 140px; object-fit: cover;"
-                                            alt="Xem trước ảnh" />
+                                            alt="Xem trước ảnh"
+                                            onerror="this.style.display='none'; document.getElementById('iconBadgePreview').style.display='inline-flex';" />
+                                        <div id="iconBadgePreview"
+                                            class="category-icon-badge fs-1"
+                                            th:classappend="${category.autoBgColor}"
+                                            th:style="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')} ? 'display: none; width: 80px; height: 80px;' : 'display: inline-flex; width: 80px; height: 80px;'">
+                                            <i th:class="${category.autoIcon}"></i>
+                                        </div>
                                     </div>
-                                    <div th:if="${category.icon != null and !#strings.isEmpty(category.icon)}"
+                                    <div th:if="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}"
                                         class="small text-muted mt-1">
                                         Ảnh hiện tại: <code th:text="${category.icon}"></code>
                                     </div>
@@ -144,10 +145,17 @@
             function previewUploadedImage(event) {
                 var input = event.target;
                 var preview = document.getElementById('imagePreview');
+                var iconBadge = document.getElementById('iconBadgePreview');
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
                     reader.onload = function (e) {
-                        preview.src = e.target.result;
+                        if (preview) {
+                            preview.src = e.target.result;
+                            preview.style.display = 'inline-block';
+                        }
+                        if (iconBadge) {
+                            iconBadge.style.display = 'none';
+                        }
                     };
                     reader.readAsDataURL(input.files[0]);
                 }

@@ -108,18 +108,23 @@
                         <tr th:each="category : ${categoryPage.content}">
                             <td class="text-center fw-semibold text-muted" th:text="${category.id}">1</td>
                             <td class="text-center">
-                                <th:block th:if="${category.icon != null and !#strings.isEmpty(category.icon)}">
-                                    <img th:if="${#strings.startsWith(category.icon, 'http')}" th:src="${category.icon}"
-                                        class="category-icon-preview" alt="Category Icon" />
-                                    <img th:unless="${#strings.startsWith(category.icon, 'http')}"
-                                        th:src="@{'/upload/' + ${category.icon}}" class="category-icon-preview"
-                                        alt="Category Icon"
-                                        onerror="this.src='https://placehold.co/100x100?text=No+Icon'" />
+                                <th:block th:if="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}">
+                                    <img th:src="@{'/upload/' + ${category.icon}}"
+                                         class="category-icon-preview"
+                                         alt="Category Icon"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';"/>
+                                    <div class="category-icon-badge"
+                                         th:classappend="${category.autoBgColor}"
+                                         style="display: none;">
+                                        <i th:class="${category.autoIcon}"></i>
+                                    </div>
                                 </th:block>
-                                <span th:if="${category.icon == null or #strings.isEmpty(category.icon)}"
-                                    class="badge bg-light text-secondary border">
-                                    <i class="fas fa-image"></i>
-                                </span>
+                                <th:block th:unless="${category.icon != null and !#strings.isEmpty(category.icon) and !#strings.startsWith(category.icon, 'http')}">
+                                    <div class="category-icon-badge"
+                                         th:classappend="${category.autoBgColor}">
+                                        <i th:class="${category.autoIcon}"></i>
+                                    </div>
+                                </th:block>
                             </td>
                             <td>
                                 <strong class="text-dark" th:text="${category.name}">Tên danh mục</strong>
