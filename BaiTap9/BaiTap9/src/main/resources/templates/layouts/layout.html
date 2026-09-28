@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title layout:title-pattern="$CONTENT_TITLE - UTEShop">UTEShop</title>
+    <link rel="stylesheet" th:href="@{/css/app.css(v=3)}">
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column; margin: 0;">
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <div style="flex: 1 0 auto; display: flex; flex-direction: column;">
+        <main layout:fragment="content" style="flex: 1 0 auto;">
+        </main>
+    </div>
+
+    <footer class="footer" style="margin-top: auto;">
+        Copyright &copy; UTEShop
+    </footer>
+</body>
+</html>
