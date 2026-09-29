@@ -7,5 +7,5 @@ public interface AuthService {
     boolean verifyRegister(String email, String otp);
     void forgotPassword(String email);
     boolean verifyResetOtp(String email, String otp);
-    void resetPassword(String email, String password);
+    void resetPasswordWithOtp(String email, String otp, String newPassword);
 }

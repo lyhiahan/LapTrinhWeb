@@ -55,7 +55,7 @@
             <td class="col-price" th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 2, 'POINT')}"></td>
             <td class="col-user" th:text="${p.username}"></td>
             <td class="col-action">
-                <div class="actions">
+                <div class="actions" th:if="${#authorization.expression('hasAnyRole(''ADMIN'', ''ROLE_ADMIN'')') or #authentication.name == p.username}">
                     <a class="btn-action btn-edit" th:href="@{/products/edit/{id}(id=${p.id})}" title="Chỉnh sửa sản phẩm">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
                         Edit
@@ -67,6 +67,7 @@
                         </button>
                     </form>
                 </div>
+                <span th:unless="${#authorization.expression('hasAnyRole(''ADMIN'', ''ROLE_ADMIN'')') or #authentication.name == p.username}" style="color: #94a3b8; font-size: 13px;">Chỉ xem</span>
             </td>
         </tr>
         <tr th:if="${products.empty}">

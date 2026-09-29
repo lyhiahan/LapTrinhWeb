@@ -37,7 +37,9 @@ public class AuthServiceImpl implements AuthService {
             .email(dto.getEmail())
             .password(passwordEncoder.encode(dto.getPassword()))
             .fullName(dto.getFullName())
-            .enabled(false)
+            .enabled(true)
+            .emailVerified(false)
+            .locked(false)
             .role(role)
             .build();
         userRepository.save(user);
@@ -47,10 +49,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public boolean verifyRegister(String email, String otp) {
-        boolean ok = otpService.verifyRegisterOtp(email, otp);
-        if (!ok) return false;
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("User không tồn tại"));
+        if (user.isLocked() || !user.isEnabled()) {
+            throw new IllegalStateException("Tài khoản đã bị quản trị viên khóa, không thể kích hoạt.");
+        }
+        if (user.isEmailVerified()) {
+            throw new IllegalStateException("Tài khoản đã được xác minh email trước đó.");
+        }
+        boolean ok = otpService.verifyRegisterOtp(email, otp);
+        if (!ok) return false;
+        user.setEmailVerified(true);
         user.setEnabled(true);
         return true;
     }
@@ -70,9 +79,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void resetPassword(String email, String password) {
+    public void resetPasswordWithOtp(String email, String otp, String newPassword) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("User không tồn tại"));
-        user.setPassword(passwordEncoder.encode(password));
+        if (user.isLocked() || !user.isEnabled()) {
+            throw new IllegalStateException("Tài khoản đã bị quản trị viên khóa.");
+        }
+        boolean ok = otpService.verifyResetPasswordOtp(email, otp);
+        if (!ok) {
+            throw new IllegalArgumentException("OTP không hợp lệ, hết hạn hoặc đã quá số lần thử.");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
     }
 }

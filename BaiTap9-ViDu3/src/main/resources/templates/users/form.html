@@ -7,6 +7,10 @@
 <div class="form-card">
 <form th:object="${userDTO}" method="post" enctype="multipart/form-data" accept-charset="UTF-8" th:action="${mode == 'create'} ? @{/users/create} : @{/users/edit/{id}(id=${userDTO.id})}">
     <h1 th:text="${mode == 'create' ? 'Thêm User' : 'Sửa User'}"></h1>
+    <div th:if="${#fields.hasGlobalErrors()}" class="alert error">
+        <p th:each="e : ${#fields.globalErrors()}" th:text="${e}"></p>
+    </div>
+    <div th:if="${error}" class="alert error" th:text="${error}"></div>
     <label>Username</label>
     <input th:field="*{username}">
     <small class="error-text" th:errors="*{username}"></small>

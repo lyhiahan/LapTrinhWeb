@@ -5,7 +5,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.iotstar.entity.OtpToken;
+import vn.iotstar.entity.User;
 import vn.iotstar.repository.OtpTokenRepository;
+import vn.iotstar.repository.UserRepository;
 import vn.iotstar.service.EmailService;
 import vn.iotstar.service.OtpService;
 
@@ -18,6 +20,7 @@ public class OtpServiceImpl implements OtpService {
     private static final int MAX_ATTEMPTS = 5;
     private static final int OTP_MINUTES = 5;
     private final OtpTokenRepository repository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final SecureRandom random = new SecureRandom();
@@ -45,18 +48,31 @@ public class OtpServiceImpl implements OtpService {
     @Override
     @Transactional
     public void sendRegisterOtp(String email) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với email: " + email));
+        if (user.isLocked() || !user.isEnabled()) {
+            throw new IllegalStateException("Tài khoản đã bị quản trị viên khóa, không thể gửi lại mã kích hoạt.");
+        }
+        if (user.isEmailVerified()) {
+            throw new IllegalStateException("Tài khoản đã được xác minh email. Vui lòng đăng nhập.");
+        }
         send(email, "REGISTER", "Shop - Xác nhận đăng ký tài khoản");
     }
 
     @Override
     @Transactional
     public void sendResetPasswordOtp(String email) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại trong hệ thống."));
+        if (user.isLocked() || !user.isEnabled()) {
+            throw new IllegalStateException("Tài khoản đã bị quản trị viên khóa, không thể yêu cầu đặt lại mật khẩu.");
+        }
         send(email, "RESET_PASSWORD", "Shop - OTP đặt lại mật khẩu");
     }
 
     private boolean verify(String email, String otp, String type) {
         OtpToken token = repository
-            .findTopByEmailAndTypeAndUsedFalseOrderByCreatedAtDesc(email, type)
+            .findFirstByEmailAndTypeAndUsedFalseOrderByCreatedAtDesc(email, type)
             .orElse(null);
         if (token == null || token.getExpiresAt().isBefore(LocalDateTime.now()) || token.getAttempts() >= MAX_ATTEMPTS)
             return false;

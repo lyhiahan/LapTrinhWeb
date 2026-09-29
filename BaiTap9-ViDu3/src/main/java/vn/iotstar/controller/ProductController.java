@@ -62,8 +62,16 @@ public class ProductController {
     }
 
     @GetMapping("/edit/{id}")
-    public String edit(@PathVariable Long id, Model model) {
-        model.addAttribute("productDTO", productService.findById(id));
+    public String edit(@PathVariable Long id, Authentication authentication, Model model, RedirectAttributes redirect) {
+        ProductDTO dto = productService.findById(id);
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_ADMIN") || a.getAuthority().equalsIgnoreCase("admin"));
+        if (!isAdmin && !dto.getUserId().equals(user.getId())) {
+            redirect.addFlashAttribute("error", "Bạn không có quyền chỉnh sửa sản phẩm này.");
+            return "redirect:/products";
+        }
+        model.addAttribute("productDTO", dto);
         model.addAttribute("mode", "edit");
         return "products/form";
     }
@@ -73,15 +81,22 @@ public class ProductController {
                        @Valid @ModelAttribute ProductDTO dto,
                        BindingResult result,
                        @RequestParam(required = false) MultipartFile image,
+                       Authentication authentication,
                        Model model,
                        RedirectAttributes redirect) {
         if (result.hasErrors()) {
             model.addAttribute("mode", "edit");
             return "products/form";
         }
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_ADMIN") || a.getAuthority().equalsIgnoreCase("admin"));
         try {
-            productService.update(id, dto, image);
+            productService.update(id, dto, image, user.getId(), isAdmin);
             redirect.addFlashAttribute("success", "Cập nhật sản phẩm thành công.");
+            return "redirect:/products";
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
             return "redirect:/products";
         } catch (Exception e) {
             result.reject("product.error", e.getMessage() != null ? e.getMessage() : "Lỗi khi cập nhật sản phẩm");
@@ -91,9 +106,12 @@ public class ProductController {
     }
 
     @PostMapping("/delete/{id}")
-    public String delete(@PathVariable Long id, RedirectAttributes redirect) {
+    public String delete(@PathVariable Long id, Authentication authentication, RedirectAttributes redirect) {
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_ADMIN") || a.getAuthority().equalsIgnoreCase("admin"));
         try {
-            productService.delete(id);
+            productService.delete(id, user.getId(), isAdmin);
             redirect.addFlashAttribute("success", "Xóa sản phẩm thành công.");
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "Xóa sản phẩm thất bại: " + e.getMessage());

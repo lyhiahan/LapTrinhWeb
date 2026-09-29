@@ -48,10 +48,18 @@ public class UserController {
         }
         try {
             userService.create(dto);
-            redirect.addFlashAttribute("success", "Tạo user thành công. Mật khẩu mặc định: 123456");
+            redirect.addFlashAttribute("success", "Tạo user thành công.");
             return "redirect:/users";
         } catch (IllegalArgumentException e) {
             result.reject("user.error", e.getMessage());
+            model.addAttribute("mode", "create");
+            return "users/form";
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            result.reject("user.error", "Username hoặc Email đã tồn tại trong hệ thống.");
+            model.addAttribute("mode", "create");
+            return "users/form";
+        } catch (Exception e) {
+            result.reject("user.error", "Tạo user thất bại: " + e.getMessage());
             model.addAttribute("mode", "create");
             return "users/form";
         }
@@ -80,6 +88,14 @@ public class UserController {
             return "redirect:/users";
         } catch (IllegalArgumentException e) {
             result.reject("user.error", e.getMessage());
+            model.addAttribute("mode", "edit");
+            return "users/form";
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            result.reject("user.error", "Username hoặc Email đã tồn tại trong hệ thống.");
+            model.addAttribute("mode", "edit");
+            return "users/form";
+        } catch (Exception e) {
+            result.reject("user.error", "Cập nhật user thất bại: " + e.getMessage());
             model.addAttribute("mode", "edit");
             return "users/form";
         }

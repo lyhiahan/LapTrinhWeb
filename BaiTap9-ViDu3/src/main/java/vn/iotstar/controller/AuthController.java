@@ -36,7 +36,8 @@ public class AuthController {
         try {
             authService.register(dto);
             redirect.addFlashAttribute("success", "OTP đã được gửi đến email.");
-            return "redirect:/verify-otp?email=" + dto.getEmail();
+            redirect.addAttribute("email", dto.getEmail());
+            return "redirect:/verify-otp";
         } catch (IllegalArgumentException e) {
             result.reject("register.error", e.getMessage());
             return "auth/register";
@@ -59,8 +60,13 @@ public class AuthController {
                          BindingResult result,
                          RedirectAttributes redirect) {
         if (result.hasErrors()) return "auth/verify-otp";
-        if (!authService.verifyRegister(dto.getEmail(), dto.getOtp())) {
-            result.reject("otp.error", "OTP không hợp lệ, hết hạn hoặc đã quá số lần thử.");
+        try {
+            if (!authService.verifyRegister(dto.getEmail(), dto.getOtp())) {
+                result.reject("otp.error", "OTP không hợp lệ, hết hạn hoặc đã quá số lần thử.");
+                return "auth/verify-otp";
+            }
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            result.reject("otp.error", e.getMessage());
             return "auth/verify-otp";
         }
         redirect.addFlashAttribute("success", "Xác nhận thành công. Hãy đăng nhập.");
@@ -75,7 +81,8 @@ public class AuthController {
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "Không thể gửi lại OTP: " + e.getMessage());
         }
-        return "redirect:/verify-otp?email=" + email;
+        redirect.addAttribute("email", email);
+        return "redirect:/verify-otp";
     }
 
     @GetMapping("/forgot-password")
@@ -94,7 +101,7 @@ public class AuthController {
             redirect.addFlashAttribute("email", dto.getEmail());
             redirect.addFlashAttribute("success", "OTP đã được gửi.");
             return "redirect:/reset-password";
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             result.reject("forgot.error", e.getMessage());
             return "auth/forgot-password";
         } catch (Exception e) {
@@ -121,12 +128,16 @@ public class AuthController {
             result.reject("password.error", "Mật khẩu xác nhận không đúng.");
         }
         if (result.hasErrors()) return "auth/reset-password";
-        if (!authService.verifyResetOtp(dto.getEmail(), otp)) {
-            result.reject("otp.error", "OTP không hợp lệ hoặc đã hết hạn.");
+        try {
+            authService.resetPasswordWithOtp(dto.getEmail(), otp, dto.getPassword());
+            redirect.addFlashAttribute("success", "Đổi mật khẩu thành công.");
+            return "redirect:/login";
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            result.reject("otp.error", e.getMessage());
+            return "auth/reset-password";
+        } catch (Exception e) {
+            result.reject("otp.error", "Đổi mật khẩu thất bại: " + e.getMessage());
             return "auth/reset-password";
         }
-        authService.resetPassword(dto.getEmail(), dto.getPassword());
-        redirect.addFlashAttribute("success", "Đổi mật khẩu thành công.");
-        return "redirect:/login";
     }
 }

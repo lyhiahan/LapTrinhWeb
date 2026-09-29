@@ -27,6 +27,11 @@
 @REM   MVNW_VERBOSE - true: enable verbose log; others: silence the output
 @REM ----------------------------------------------------------------------------
 
+@IF EXIST "C:\Program Files\Java\latest\jdk-26\bin\java.exe" (
+    @IF "%JAVA_HOME%"=="" (SET "JAVA_HOME=C:\Program Files\Java\latest\jdk-26")
+    @IF "%JAVA_HOME%"=="C:\Java\jdk1.8.0_431" (SET "JAVA_HOME=C:\Program Files\Java\latest\jdk-26")
+)
+
 @IF "%__MVNW_ARG0_NAME__%"=="" (SET __MVNW_ARG0_NAME__=%~nx0)
 @SET __MVNW_CMD__=
 @SET __MVNW_ERROR__=

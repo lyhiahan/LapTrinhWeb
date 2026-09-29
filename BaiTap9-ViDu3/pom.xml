@@ -97,6 +97,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<encoding>UTF-8</encoding>
+					<forceJavacCompilerUse>true</forceJavacCompilerUse>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.mapstruct</groupId>

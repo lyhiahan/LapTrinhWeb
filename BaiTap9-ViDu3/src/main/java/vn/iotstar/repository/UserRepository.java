@@ -29,4 +29,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
         group by u.id
     """)
     java.util.List<Object[]> countProductsForUsers();
+
+    @Modifying
+    @Query("UPDATE User u SET u.emailVerified = true WHERE u.enabled = true AND u.emailVerified = false")
+    int migrateLegacyActiveUsers();
+
+    @Modifying
+    @Query("UPDATE User u SET u.role = :targetRole WHERE u.role = :oldRole")
+    int updateUserRole(@Param("oldRole") vn.iotstar.entity.Role oldRole, @Param("targetRole") vn.iotstar.entity.Role targetRole);
 }

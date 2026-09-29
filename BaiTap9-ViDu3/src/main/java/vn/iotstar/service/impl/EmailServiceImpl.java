@@ -15,23 +15,21 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendOtp(String email, String otp, String subject) {
-        log.info("==================================================");
-        log.info(">>> MA OTP XAC THUC CHO [{}]: {}", email, otp);
-        log.info("==================================================");
-        java.util.concurrent.CompletableFuture.runAsync(() -> {
-            try {
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(email);
-                message.setSubject(subject);
-                message.setText("""
-                    Xin chao,
-                    Ma OTP cua ban la: %s
-                    OTP co hieu luc trong 5 phut va chi su dung mot lan.
-                    """.formatted(otp));
-                mailSender.send(message);
-            } catch (Exception e) {
-                log.warn("Khong the gui mail qua SMTP cho {}: {}", email, e.getMessage());
-            }
-        });
+        log.info("Bắt đầu gửi mã OTP xác thực tới email [{}] với tiêu đề [{}]", email, subject);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject(subject);
+            message.setText("""
+                Xin chao,
+                Ma OTP cua ban la: %s
+                OTP co hieu luc trong 5 phut va chi su dung mot lan.
+                """.formatted(otp));
+            mailSender.send(message);
+            log.info("Đã gửi thành công email OTP tới [{}]", email);
+        } catch (Exception e) {
+            log.error("Không thể gửi mail qua SMTP cho {}: {}", email, e.getMessage());
+            throw new IllegalStateException("Không thể gửi email OTP qua dịch vụ thư: " + e.getMessage(), e);
+        }
     }
 }

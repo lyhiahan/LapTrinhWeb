@@ -17,13 +17,15 @@ public class CustomUserDetails implements UserDetails {
     private final String username;
     private final String password;
     private final boolean enabled;
+    private final boolean locked;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.enabled = user.isEnabled();
+        this.enabled = user.isEnabled() && user.isEmailVerified();
+        this.locked = user.isLocked();
         List<GrantedAuthority> auths = new ArrayList<>();
         if (user.getRole() != null && user.getRole().getName() != null) {
             String raw = user.getRole().getName().trim();
@@ -59,5 +61,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
     }
 }

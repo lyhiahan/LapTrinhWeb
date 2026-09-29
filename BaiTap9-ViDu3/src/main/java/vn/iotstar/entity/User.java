@@ -34,8 +34,16 @@ public class User {
     private String fullName;
 
     @Builder.Default
-    @Column(nullable = false)
-    private boolean enabled = false;
+    @Column(nullable = false, columnDefinition = "bit default 1")
+    private boolean enabled = true;
+
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "bit default 0")
+    private boolean emailVerified = false;
+
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "bit default 0")
+    private boolean locked = false;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "role_id", nullable = false)
