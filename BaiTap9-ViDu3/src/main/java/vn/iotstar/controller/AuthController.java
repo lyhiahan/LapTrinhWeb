@@ -1,5 +1,6 @@
 package vn.iotstar.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -31,14 +32,15 @@ public class AuthController {
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute RegisterDTO dto,
                            BindingResult result,
+                           HttpServletRequest request,
                            RedirectAttributes redirect) {
         if (result.hasErrors()) return "auth/register";
         try {
-            authService.register(dto);
+            authService.register(dto, extractClientIp(request));
             redirect.addFlashAttribute("success", "OTP đã được gửi đến email.");
             redirect.addAttribute("email", dto.getEmail());
             return "redirect:/verify-otp";
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             result.reject("register.error", e.getMessage());
             return "auth/register";
         } catch (Exception e) {
@@ -74,10 +76,14 @@ public class AuthController {
     }
 
     @PostMapping("/resend-register-otp")
-    public String resend(@RequestParam String email, RedirectAttributes redirect) {
+    public String resend(@RequestParam String email,
+                         HttpServletRequest request,
+                         RedirectAttributes redirect) {
         try {
-            otpService.sendRegisterOtp(email);
+            otpService.sendRegisterOtp(email, extractClientIp(request));
             redirect.addFlashAttribute("success", "Đã gửi lại OTP.");
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "Không thể gửi lại OTP: " + e.getMessage());
         }
@@ -94,10 +100,11 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public String forgot(@Valid @ModelAttribute ForgotPasswordDTO dto,
                          BindingResult result,
+                         HttpServletRequest request,
                          RedirectAttributes redirect) {
         if (result.hasErrors()) return "auth/forgot-password";
         try {
-            authService.forgotPassword(dto.getEmail());
+            authService.forgotPassword(dto.getEmail(), extractClientIp(request));
             redirect.addFlashAttribute("email", dto.getEmail());
             redirect.addFlashAttribute("success", "OTP đã được gửi.");
             return "redirect:/reset-password";
@@ -108,6 +115,15 @@ public class AuthController {
             result.reject("forgot.error", "Gửi OTP thất bại: " + e.getMessage());
             return "auth/forgot-password";
         }
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        if (request == null) return "unknown";
+        String xf = request.getHeader("X-Forwarded-For");
+        if (xf != null && !xf.isBlank()) {
+            return xf.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     @GetMapping("/reset-password")

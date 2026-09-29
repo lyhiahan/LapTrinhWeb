@@ -72,21 +72,79 @@ public class UserServiceImpl implements UserService {
         User user = mapper.toEntity(dto);
         Role role = resolveRole(dto.getRoleName());
         user.setRole(role);
-        String pass = (defaultUserPassword != null && !defaultUserPassword.isBlank()) 
-            ? defaultUserPassword 
-            : java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+
+        String pass;
+        if (dto.getInitialPassword() != null && !dto.getInitialPassword().isBlank()) {
+            if (dto.getInitialPassword().trim().length() < 6) {
+                throw new IllegalArgumentException("Mật khẩu ban đầu phải có ít nhất 6 ký tự");
+            }
+            pass = dto.getInitialPassword().trim();
+        } else if (defaultUserPassword != null && !defaultUserPassword.isBlank()) {
+            pass = defaultUserPassword.trim();
+        } else {
+            pass = generateSecurePassword();
+        }
+
         user.setPassword(passwordEncoder.encode(pass));
         user.setEnabled(dto.isEnabled());
         user.setEmailVerified(true);
         user.setLocked(!dto.isEnabled());
-        return mapper.toDTO(userRepository.save(user));
+        UserDTO savedDto = mapper.toDTO(userRepository.save(user));
+        savedDto.setInitialPassword(pass);
+        return savedDto;
+    }
+
+    private String generateSecurePassword() {
+        String upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+        String lower = "abcdefghijkmnpqrstuvwxyz";
+        String digits = "23456789";
+        String special = "@#$!";
+        String all = upper + lower + digits + special;
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        sb.append(upper.charAt(random.nextInt(upper.length())));
+        sb.append(lower.charAt(random.nextInt(lower.length())));
+        sb.append(digits.charAt(random.nextInt(digits.length())));
+        sb.append(special.charAt(random.nextInt(special.length())));
+        for (int i = 4; i < 10; i++) {
+            sb.append(all.charAt(random.nextInt(all.length())));
+        }
+        java.util.List<Character> list = new java.util.ArrayList<>();
+        for (char c : sb.toString().toCharArray()) list.add(c);
+        java.util.Collections.shuffle(list, random);
+        StringBuilder res = new StringBuilder();
+        for (char c : list) res.append(c);
+        return res.toString();
     }
 
     @Override
     @Transactional
     public UserDTO update(Long id, UserDTO dto) {
+        return update(id, dto, null);
+    }
+
+    @Override
+    @Transactional
+    public UserDTO update(Long id, UserDTO dto, Long currentUserId) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("User không tồn tại"));
+
+        // Ràng buộc nghiệp vụ: Không cho phép tự khóa tài khoản hoặc tự hạ quyền quản trị
+        if (currentUserId != null && currentUserId.equals(id)) {
+            if (!dto.isEnabled()) {
+                throw new IllegalArgumentException("Không thể tự khóa tài khoản của chính mình.");
+            }
+            if (dto.getRoleName() != null && !dto.getRoleName().isBlank()) {
+                String reqRole = dto.getRoleName().trim().toUpperCase();
+                if (!reqRole.startsWith("ROLE_")) {
+                    reqRole = "ROLE_" + reqRole;
+                }
+                if (!reqRole.equals("ROLE_ADMIN")) {
+                    throw new IllegalArgumentException("Không thể tự hạ vai trò Quản trị viên của chính mình.");
+                }
+            }
+        }
+
         if (!user.getEmail().equalsIgnoreCase(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail()))
             throw new IllegalArgumentException("Email đã tồn tại");
         if (!user.getUsername().equalsIgnoreCase(dto.getUsername()) && userRepository.existsByUsername(dto.getUsername()))
@@ -104,18 +162,30 @@ public class UserServiceImpl implements UserService {
     }
 
     private Role resolveRole(String roleName) {
-        String target = (roleName == null || roleName.isBlank()) ? "ROLE_USER" : roleName.trim();
-        if (!target.toUpperCase().startsWith("ROLE_")) {
-            target = "ROLE_" + target.toUpperCase();
+        String target = (roleName == null || roleName.isBlank()) ? "ROLE_USER" : roleName.trim().toUpperCase();
+        if (!target.startsWith("ROLE_")) {
+            target = "ROLE_" + target;
         }
-        String finalTarget = target;
+        if (!target.equals("ROLE_USER") && !target.equals("ROLE_ADMIN")) {
+            throw new IllegalArgumentException("Vai trò không hợp lệ: [" + roleName + "]. Hệ thống chỉ chấp nhận ROLE_USER hoặc ROLE_ADMIN.");
+        }
+        final String finalTarget = target;
         return roleRepository.findByName(finalTarget)
-            .orElseGet(() -> roleRepository.save(Role.builder().name(finalTarget).build()));
+            .orElseThrow(() -> new IllegalStateException("Vai trò [" + finalTarget + "] chưa được cấu hình sẵn trong hệ thống."));
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        delete(id, null);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id, Long currentUserId) {
+        if (currentUserId != null && currentUserId.equals(id)) {
+            throw new IllegalArgumentException("Không thể tự xóa tài khoản đang đăng nhập.");
+        }
         User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("User không tồn tại"));
         java.util.List<vn.iotstar.entity.Product> userProducts = productRepository.findByUserId(id);

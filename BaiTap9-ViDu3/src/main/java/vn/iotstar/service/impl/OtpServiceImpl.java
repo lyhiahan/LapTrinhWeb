@@ -23,6 +23,7 @@ public class OtpServiceImpl implements OtpService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final vn.iotstar.security.OtpRateLimiter otpRateLimiter;
     private final SecureRandom random = new SecureRandom();
 
     private String generateOtp() {
@@ -48,6 +49,12 @@ public class OtpServiceImpl implements OtpService {
     @Override
     @Transactional
     public void sendRegisterOtp(String email) {
+        sendRegisterOtp(email, null);
+    }
+
+    @Override
+    @Transactional
+    public void sendRegisterOtp(String email, String clientIp) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với email: " + email));
         if (user.isLocked() || !user.isEnabled()) {
@@ -56,17 +63,25 @@ public class OtpServiceImpl implements OtpService {
         if (user.isEmailVerified()) {
             throw new IllegalStateException("Tài khoản đã được xác minh email. Vui lòng đăng nhập.");
         }
+        otpRateLimiter.checkAndRecord(email, clientIp);
         send(email, "REGISTER", "Shop - Xác nhận đăng ký tài khoản");
     }
 
     @Override
     @Transactional
     public void sendResetPasswordOtp(String email) {
+        sendResetPasswordOtp(email, null);
+    }
+
+    @Override
+    @Transactional
+    public void sendResetPasswordOtp(String email, String clientIp) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại trong hệ thống."));
         if (user.isLocked() || !user.isEnabled()) {
             throw new IllegalStateException("Tài khoản đã bị quản trị viên khóa, không thể yêu cầu đặt lại mật khẩu.");
         }
+        otpRateLimiter.checkAndRecord(email, clientIp);
         send(email, "RESET_PASSWORD", "Shop - OTP đặt lại mật khẩu");
     }
 

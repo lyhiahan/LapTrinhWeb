@@ -26,6 +26,15 @@ public class UserDTO {
     private boolean enabled;
     private String roleName;
     private long productCount;
+    private String initialPassword;
+
+    public String getInitialPassword() {
+        return initialPassword;
+    }
+
+    public void setInitialPassword(String initialPassword) {
+        this.initialPassword = initialPassword;
+    }
 
     public Long getId() {
         return id;

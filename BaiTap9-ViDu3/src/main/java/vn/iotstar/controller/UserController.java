@@ -47,8 +47,10 @@ public class UserController {
             return "users/form";
         }
         try {
-            userService.create(dto);
-            redirect.addFlashAttribute("success", "Tạo user thành công.");
+            UserDTO created = userService.create(dto);
+            redirect.addFlashAttribute("createdPassword", created.getInitialPassword());
+            redirect.addFlashAttribute("createdUsername", created.getUsername());
+            redirect.addFlashAttribute("success", "Tạo user [" + created.getUsername() + "] thành công! Mật khẩu ban đầu: " + created.getInitialPassword());
             return "redirect:/users";
         } catch (IllegalArgumentException e) {
             result.reject("user.error", e.getMessage());
@@ -66,9 +68,16 @@ public class UserController {
     }
 
     @GetMapping("/edit/{id}")
-    public String edit(@PathVariable Long id, Model model) {
+    public String edit(@PathVariable Long id,
+                       org.springframework.security.core.Authentication authentication,
+                       Model model) {
         model.addAttribute("userDTO", userService.findById(id));
         model.addAttribute("mode", "edit");
+        boolean isSelf = false;
+        if (authentication != null && authentication.getPrincipal() instanceof vn.iotstar.security.CustomUserDetails cud) {
+            isSelf = cud.getId().equals(id);
+        }
+        model.addAttribute("isSelf", isSelf);
         return "users/form";
     }
 
@@ -76,27 +85,38 @@ public class UserController {
     public String edit(@PathVariable Long id,
                        @Valid @ModelAttribute UserDTO dto,
                        BindingResult result,
+                       org.springframework.security.core.Authentication authentication,
                        Model model,
                        RedirectAttributes redirect) {
+        Long currentUserId = null;
+        boolean isSelf = false;
+        if (authentication != null && authentication.getPrincipal() instanceof vn.iotstar.security.CustomUserDetails cud) {
+            currentUserId = cud.getId();
+            isSelf = cud.getId().equals(id);
+        }
         if (result.hasErrors()) {
             model.addAttribute("mode", "edit");
+            model.addAttribute("isSelf", isSelf);
             return "users/form";
         }
         try {
-            userService.update(id, dto);
+            userService.update(id, dto, currentUserId);
             redirect.addFlashAttribute("success", "Cập nhật user thành công.");
             return "redirect:/users";
         } catch (IllegalArgumentException e) {
             result.reject("user.error", e.getMessage());
             model.addAttribute("mode", "edit");
+            model.addAttribute("isSelf", isSelf);
             return "users/form";
         } catch (org.springframework.dao.DataIntegrityViolationException e) {
             result.reject("user.error", "Username hoặc Email đã tồn tại trong hệ thống.");
             model.addAttribute("mode", "edit");
+            model.addAttribute("isSelf", isSelf);
             return "users/form";
         } catch (Exception e) {
             result.reject("user.error", "Cập nhật user thất bại: " + e.getMessage());
             model.addAttribute("mode", "edit");
+            model.addAttribute("isSelf", isSelf);
             return "users/form";
         }
     }
@@ -105,15 +125,15 @@ public class UserController {
     public String delete(@PathVariable Long id,
                          org.springframework.security.core.Authentication authentication,
                          RedirectAttributes redirect) {
+        Long currentUserId = null;
         if (authentication != null && authentication.getPrincipal() instanceof vn.iotstar.security.CustomUserDetails cud) {
-            if (cud.getId().equals(id)) {
-                redirect.addFlashAttribute("error", "Không thể tự xóa tài khoản đang đăng nhập.");
-                return "redirect:/users";
-            }
+            currentUserId = cud.getId();
         }
         try {
-            userService.delete(id);
+            userService.delete(id, currentUserId);
             redirect.addFlashAttribute("success", "Xóa user thành công.");
+        } catch (IllegalArgumentException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
             redirect.addFlashAttribute("error", "Xóa user thất bại: " + e.getMessage());
         }

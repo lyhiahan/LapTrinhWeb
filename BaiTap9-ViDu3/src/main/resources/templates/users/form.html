@@ -11,6 +11,10 @@
         <p th:each="e : ${#fields.globalErrors()}" th:text="${e}"></p>
     </div>
     <div th:if="${error}" class="alert error" th:text="${error}"></div>
+    <div th:if="${isSelf}" class="alert info" style="background:#e0f2fe; color:#0369a1; border-color:#bae6fd;">
+        ℹ Bạn đang chỉnh sửa tài khoản cá nhân hiện tại. Bạn không thể tự khóa tài khoản hoặc tự hạ quyền Admin của chính mình.
+    </div>
+
     <label>Username</label>
     <input th:field="*{username}">
     <small class="error-text" th:errors="*{username}"></small>
@@ -23,13 +27,24 @@
     <input th:field="*{fullName}">
     <small class="error-text" th:errors="*{fullName}"></small>
 
+    <div th:if="${mode == 'create'}">
+        <label>Mật khẩu khởi tạo <span style="font-weight: normal; color: #64748b; font-size: 0.9em;">(để trống hệ thống sẽ tự sinh ngẫu nhiên an toàn)</span></label>
+        <input type="password" th:field="*{initialPassword}" placeholder="Để trống để tự tạo mật khẩu ngẫu nhiên...">
+        <small class="error-text" th:errors="*{initialPassword}"></small>
+    </div>
+
     <label>Role</label>
-    <select th:field="*{roleName}">
+    <select th:field="*{roleName}" th:disabled="${isSelf}">
         <option value="ROLE_USER">USER</option>
         <option value="ROLE_ADMIN">ADMIN</option>
     </select>
+    <input type="hidden" name="roleName" th:value="${userDTO.roleName}" th:if="${isSelf}"/>
 
-    <label><input type="checkbox" th:field="*{enabled}"> Enabled</label>
+    <label>
+        <input type="checkbox" th:field="*{enabled}" th:disabled="${isSelf}"> Enabled
+    </label>
+    <input type="hidden" name="enabled" value="true" th:if="${isSelf}"/>
+
     <button class="button">Lưu</button>
     <a class="button secondary" th:href="@{/users}">Hủy</a>
 </form>

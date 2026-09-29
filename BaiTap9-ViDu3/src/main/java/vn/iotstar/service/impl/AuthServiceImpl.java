@@ -23,6 +23,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void register(RegisterDTO dto) {
+        register(dto, null);
+    }
+
+    @Override
+    @Transactional
+    public void register(RegisterDTO dto, String clientIp) {
         if (userRepository.existsByUsername(dto.getUsername()))
             throw new IllegalArgumentException("Username đã tồn tại");
         if (userRepository.existsByEmail(dto.getEmail()))
@@ -43,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
             .role(role)
             .build();
         userRepository.save(user);
-        otpService.sendRegisterOtp(dto.getEmail());
+        otpService.sendRegisterOtp(dto.getEmail(), clientIp);
     }
 
     @Override
@@ -67,14 +73,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void forgotPassword(String email) {
-        if (!userRepository.existsByEmail(email))
-            throw new IllegalArgumentException("Email không tồn tại");
-        otpService.sendResetPasswordOtp(email);
+        forgotPassword(email, null);
     }
 
     @Override
-    public boolean verifyResetOtp(String email, String otp) {
-        return otpService.verifyResetPasswordOtp(email, otp);
+    @Transactional
+    public void forgotPassword(String email, String clientIp) {
+        if (!userRepository.existsByEmail(email))
+            throw new IllegalArgumentException("Email không tồn tại");
+        otpService.sendResetPasswordOtp(email, clientIp);
     }
 
     @Override

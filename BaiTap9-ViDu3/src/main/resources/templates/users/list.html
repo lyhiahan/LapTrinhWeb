@@ -5,7 +5,15 @@
 <div th:replace="~{layouts/layout :: page(~{::main})}">
 <main class="container">
 <h1>Quản lý Users</h1>
-<div th:if="${success}" class="alert success" th:text="${success}"></div>
+<div th:if="${createdPassword}" class="alert info" style="background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 14px 18px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div>
+        <strong>🔑 Mật khẩu ban đầu của user <span th:text="${createdUsername}"></span>:</strong>
+        <code style="background: #d1fae5; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 1.1em; color: #047857;" id="passValue" th:text="${createdPassword}"></code>
+        <div style="font-size: 0.85em; color: #047857; margin-top: 4px;">⚠ Mật khẩu này chỉ hiển thị một lần. Hãy sao chép và gửi cho người dùng.</div>
+    </div>
+    <button type="button" class="button" style="padding: 6px 14px; font-size: 0.85rem;" onclick="navigator.clipboard.writeText(document.getElementById('passValue').innerText); this.innerText='Đã sao chép!';">Sao chép</button>
+</div>
+<div th:if="${success && !createdPassword}" class="alert success" th:text="${success}"></div>
 <div th:if="${error}" class="alert error" th:text="${error}"></div>
 
 <div class="toolbar">

@@ -8,7 +8,9 @@ public interface UserService {
     UserDTO findById(Long id);
     UserDTO create(UserDTO dto);
     UserDTO update(Long id, UserDTO dto);
+    UserDTO update(Long id, UserDTO dto, Long currentUserId);
     void delete(Long id);
+    void delete(Long id, Long currentUserId);
     long countUsers();
     long countProducts(Long userId);
 }

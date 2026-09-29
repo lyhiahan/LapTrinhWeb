@@ -14,6 +14,7 @@ import vn.iotstar.repository.UserRepository;
 
 @Slf4j
 @Component
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "app.initializer.enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
@@ -51,17 +52,7 @@ public class DataInitializer implements CommandLineRunner {
             log.info(">>> Đã di chuyển người dùng từ role cũ [admin] sang [ROLE_ADMIN] và dọn dẹp role cũ.");
         });
 
-        // 3. Tự động kích hoạt email cho các tài khoản cũ đang hoạt động
-        try {
-            int migratedCount = userRepository.migrateLegacyActiveUsers();
-            if (migratedCount > 0) {
-                log.info(">>> Đã đồng bộ trạng thái xác minh email cho {} tài khoản hoạt động sẵn có.", migratedCount);
-            }
-        } catch (Exception e) {
-            log.warn("Bỏ qua đồng bộ trạng thái user: {}", e.getMessage());
-        }
-
-        // 4. Khởi tạo tài khoản demo nếu được bật qua cấu hình
+        // 3. Khởi tạo tài khoản demo nếu được bật qua cấu hình
         if (!seedDemoAccounts) {
             log.info(">>> Môi trường không bật seed demo accounts (SEED_DEMO_ACCOUNTS=false). Bỏ qua tạo admin/user mặc định.");
             return;
