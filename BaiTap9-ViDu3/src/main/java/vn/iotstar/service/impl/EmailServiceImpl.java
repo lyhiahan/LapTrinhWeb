@@ -15,7 +15,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendOtp(String email, String otp, String subject) {
-        log.info("Bắt đầu gửi mã OTP xác thực tới email [{}] với tiêu đề [{}]", email, subject);
+        log.info("==================================================");
+        log.info(">>> [OTP CONSOLE] Mã OTP gửi tới {}: {} <<<", email, otp);
+        log.info("==================================================");
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(email);
