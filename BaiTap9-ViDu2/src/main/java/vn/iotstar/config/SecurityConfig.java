@@ -3,6 +3,8 @@ package vn.iotstar.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -19,6 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final Environment environment;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,29 +42,34 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        boolean isDevOrTest = environment.acceptsProfiles(Profiles.of("dev", "test", "default"));
+
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers(
                     "/login",
                     "/css/**",
                     "/js/**",
                     "/images/**",
-                    "/uploads/**",
-                    "/h2-console",
-                    "/h2-console/**"
-                ).permitAll()
-                .requestMatchers("/admin/**")
-                .hasRole("ADMIN")
-                .anyRequest()
-                .authenticated()
-            )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console", "/h2-console/**")
-            )
-            .headers(headers -> headers
-                .frameOptions(frameOptions -> frameOptions.sameOrigin())
-            )
-            .formLogin(form -> form
+                    "/uploads/**"
+                ).permitAll();
+
+                // Chỉ cho phép truy cập H2 Console ở môi trường dev/test
+                if (isDevOrTest) {
+                    auth.requestMatchers("/h2-console", "/h2-console/**").permitAll();
+                }
+
+                auth.requestMatchers("/admin/**").hasRole("ADMIN")
+                    .anyRequest().authenticated();
+            });
+
+        // Chỉ tắt CSRF và cho phép frameOptions cùng nguồn cho H2 Console ở môi trường dev/test
+        if (isDevOrTest) {
+            http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console", "/h2-console/**"))
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+        }
+
+        http.formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/", true)

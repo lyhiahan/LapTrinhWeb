@@ -116,8 +116,26 @@ class CustomLoginIntegrationTests {
     }
 
     @Test
+    void shouldLoginWithRealAdminCredentialsAndAccessAdminDashboard() throws Exception {
+        // 1. Thực hiện đăng nhập thực tế với tài khoản admin01 đã được khởi tạo bởi DataInitializer
+        var mvcResult = mockMvc.perform(formLogin("/login").user("admin01").password("123456"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andExpect(authenticated().withUsername("admin01"))
+                .andReturn();
+
+        // 2. Sử dụng phiên đăng nhập (session) thực tế để truy cập vào trang quản trị /admin/dashboard
+        var session = (org.springframework.mock.web.MockHttpSession) mvcResult.getRequest().getSession();
+        Assertions.assertNotNull(session);
+
+        mockMvc.perform(get("/admin/dashboard").session(session))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Chào mừng Admin")));
+    }
+
+    @Test
     void shouldAllowAccessToH2ConsoleWithoutRedirectingToLogin() throws Exception {
-        // H2 console được permitAll, không bị Security chuyển hướng về /login (302)
+        // H2 console được permitAll trong môi trường test/dev, không bị Security chuyển hướng về /login (302)
         // và được cấu hình X-Frame-Options: SAMEORIGIN
         mockMvc.perform(get("/h2-console"))
                 .andExpect(status().is(not(302)))
@@ -178,5 +196,24 @@ class CustomLoginIntegrationTests {
                 .andExpect(content().string(containsString("user01")))
                 .andExpect(content().string(containsString("user01@gmail.com")))
                 .andExpect(content().string(containsString("ROLE_USER")));
+    }
+
+    @Test
+    void shouldDetectUsernameAndEmailCrossConflict() {
+        // user01 và user01@gmail.com đã tồn tại trong database
+        // 1. Trùng username trực tiếp
+        Assertions.assertTrue(userRepository.existsByUsernameOrEmailConflict("user01", "newemail@example.com"));
+
+        // 2. Trùng email trực tiếp
+        Assertions.assertTrue(userRepository.existsByUsernameOrEmailConflict("newuser", "user01@gmail.com"));
+
+        // 3. Xung đột chéo: username đăng ký mới trùng với email của user01
+        Assertions.assertTrue(userRepository.existsByUsernameOrEmailConflict("user01@gmail.com", "other@example.com"));
+
+        // 4. Xung đột chéo: email đăng ký mới trùng với username của user01
+        Assertions.assertTrue(userRepository.existsByUsernameOrEmailConflict("otheruser", "user01"));
+
+        // 5. Cặp username và email hoàn toàn mới -> không xung đột
+        Assertions.assertFalse(userRepository.existsByUsernameOrEmailConflict("completely_brand_new_user", "completely_new@example.com"));
     }
 }

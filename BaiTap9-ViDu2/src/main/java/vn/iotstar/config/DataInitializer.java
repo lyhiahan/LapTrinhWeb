@@ -13,7 +13,7 @@ import vn.iotstar.repository.UserRepository;
 
 @Slf4j
 @Component
-@Profile("!prod")
+@Profile({"dev", "test", "default"})
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
@@ -31,8 +31,8 @@ public class DataInitializer implements CommandLineRunner {
             roleRepository.save(Role.builder().name("ROLE_ADMIN").build())
         );
 
-        // Tạo tài khoản mẫu thông thường (chỉ tạo mới nếu chưa tồn tại, không ghi đè dữ liệu người dùng)
-        if (!userRepository.existsByUsername("user01")) {
+        // Tạo tài khoản mẫu thông thường (kiểm tra cả username và email)
+        if (!userRepository.existsByUsername("user01") && !userRepository.existsByEmail("user01@gmail.com")) {
             userRepository.save(User.builder()
                 .username("user01")
                 .email("user01@gmail.com")
@@ -46,8 +46,8 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Đã khởi tạo tài khoản mẫu user01");
         }
 
-        // Tạo tài khoản quản trị viên admin01
-        if (!userRepository.existsByUsername("admin01")) {
+        // Tạo tài khoản quản trị viên admin01 (kiểm tra cả username và email)
+        if (!userRepository.existsByUsername("admin01") && !userRepository.existsByEmail("admin01@gmail.com")) {
             userRepository.save(User.builder()
                 .username("admin01")
                 .email("admin01@gmail.com")
@@ -61,8 +61,8 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Đã khởi tạo tài khoản mẫu admin01");
         }
 
-        // Tạo tài khoản bị vô hiệu hóa (disabled) để phục vụ kiểm thử
-        if (!userRepository.existsByUsername("disabled01")) {
+        // Tạo tài khoản bị vô hiệu hóa (disabled) để phục vụ kiểm thử (kiểm tra cả username và email)
+        if (!userRepository.existsByUsername("disabled01") && !userRepository.existsByEmail("disabled01@gmail.com")) {
             userRepository.save(User.builder()
                 .username("disabled01")
                 .email("disabled01@gmail.com")
