@@ -10,6 +10,8 @@
     </nav>
     <div class="account" th:if="${#authorization.expression('isAuthenticated()')}">
         <span th:text="${#authentication.name}"></span>
+        <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="badge badge-admin">ADMIN</span>
+        <span th:unless="${#authorization.expression('hasRole(''ADMIN'')')}" class="badge badge-user">USER</span>
         <form th:action="@{/logout}" method="post" style="display:inline">
             <button type="submit" class="link-button">Logout</button>
         </form>
