@@ -46,12 +46,20 @@ public class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/images/**",
-                    "/uploads/**"
+                    "/uploads/**",
+                    "/h2-console",
+                    "/h2-console/**"
                 ).permitAll()
                 .requestMatchers("/admin/**")
                 .hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()
+            )
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/h2-console", "/h2-console/**")
+            )
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())
             )
             .formLogin(form -> form
                 .loginPage("/login")

@@ -17,7 +17,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         User user = userRepository
-            .findByUsernameOrEmail(login, login)
+            .findByUsername(login)
+            .or(() -> userRepository.findByEmail(login))
             .orElseThrow(() ->
                 new UsernameNotFoundException(
                     "Không tìm thấy username/email: " + login
