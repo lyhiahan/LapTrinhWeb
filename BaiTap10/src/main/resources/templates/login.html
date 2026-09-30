@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - JWT Nimbus Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .title { font-size: 26px; font-weight: 700; margin-bottom: 8px; color: #38bdf8; text-align: center; }
+        .subtitle { font-size: 14px; color: #94a3b8; text-align: center; margin-bottom: 30px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 24px; background: rgba(15, 23, 42, 0.6); padding: 4px; border-radius: 12px; }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active { background: #38bdf8; color: #0f172a; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: #cbd5e1; }
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+        /* Focus-visible dành cho điều hướng bàn phím */
+        button:focus-visible, input:focus-visible, a:focus-visible {
+            outline: 2px solid #38bdf8 !important;
+            outline-offset: 3px !important;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn-submit:hover { opacity: 0.95; }
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+        .alert {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            display: none;
+        }
+        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; }
+        .alert-success { background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #86efac; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1 class="title">Spring Boot 3 + Nimbus JWT</h1>
+    <p class="subtitle">Xác thực hệ thống bằng thư viện Nimbus</p>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="tabLoginBtn" onclick="switchTab('login')">Đăng nhập</button>
+        <button class="tab-btn" id="tabSignupBtn" onclick="switchTab('signup')">Đăng ký</button>
+    </div>
+
+    <!-- Form Đăng nhập -->
+    <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" placeholder="admin@example.com" required>
+        </div>
+        <div class="form-group">
+            <label for="loginPassword">Mật khẩu</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-submit">Đăng nhập</button>
+    </form>
+
+    <!-- Form Đăng ký -->
+    <form id="signupForm" style="display: none;" onsubmit="handleSignup(event)">
+        <div class="form-group">
+            <label for="signupFullName">Họ và tên</label>
+            <input type="text" id="signupFullName" placeholder="Nguyễn Văn A" required>
+        </div>
+        <div class="form-group">
+            <label for="signupEmail">Email</label>
+            <input type="email" id="signupEmail" placeholder="user@example.com" required>
+        </div>
+        <div class="form-group">
+            <label for="signupPassword">Mật khẩu</label>
+            <input type="password" id="signupPassword" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-submit">Tạo tài khoản</button>
+    </form>
+
+    <div id="alertBox" class="alert"></div>
+</div>
+
+<script src="/js/main.js"></script>
+</body>
+</html>

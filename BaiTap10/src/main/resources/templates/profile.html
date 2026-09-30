@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ người dùng - JWT Nimbus Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 30px 16px;
+        }
+        .container { max-width: 960px; margin: 0 auto; }
+        
+        /* Focus-visible dành cho người dùng điều hướng bằng bàn phím */
+        button:focus-visible, input:focus-visible, a:focus-visible {
+            outline: 2px solid #38bdf8 !important;
+            outline-offset: 3px !important;
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .header h1 { font-size: 22px; color: #38bdf8; font-weight: 700; }
+        .btn-logout {
+            padding: 8px 16px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background: #ef4444; color: #ffffff; }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .card h2 { font-size: 17px; margin-bottom: 16px; color: #94a3b8; font-weight: 600; }
+        .info-row { display: flex; margin-bottom: 12px; flex-wrap: wrap; }
+        .info-label { width: 160px; color: #94a3b8; font-weight: 500; font-size: 14px; }
+        .info-value { flex: 1; color: #f8fafc; font-weight: 600; font-size: 14px; min-width: 200px; }
+
+        /* Vùng hiển thị Token che mật độ nhạy cảm */
+        .token-wrapper {
+            margin-top: 12px;
+            background: #090d16;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .token-actions { display: flex; gap: 8px; }
+        .btn-token-tool {
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #38bdf8;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-token-tool:hover { background: #38bdf8; color: #0f172a; }
+        .token-box {
+            word-break: break-all;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: #38bdf8;
+            line-height: 1.5;
+        }
+
+        /* Responsive Table */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 620px; }
+        th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 14px; }
+        th { color: #94a3b8; font-weight: 600; background: rgba(15, 23, 42, 0.4); }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-active { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .badge-locked { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        /* Nút khóa màu đỏ rõ ràng cảnh báo nguy hiểm */
+        .btn-lock { background: #ef4444; color: #ffffff; }
+        .btn-lock:hover { background: #dc2626; }
+        .btn-unlock { background: #10b981; color: #ffffff; }
+        .btn-unlock:hover { background: #059669; }
+
+        /* Grid hiển thị 4 nút kiểm thử mã lỗi */
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+        .btn-test-card {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            width: 100%;
+        }
+        .btn-test-card:hover {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.1);
+            transform: translateY(-2px);
+        }
+        .btn-test-card:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .test-code-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            margin-bottom: 6px;
+        }
+        .test-title { font-size: 13px; font-weight: 600; color: #f8fafc; }
+
+        .result-box {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 10px;
+            background: #090d16;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            display: none;
+            white-space: pre-wrap;
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+<body onload="loadProfileData()">
+
+<div class="container">
+    <div class="header">
+        <h1>Bảng điều khiển & Xác thực JWT Nimbus</h1>
+        <button class="btn-logout" onclick="handleLogout()">Đăng xuất</button>
+    </div>
+
+    <!-- Thông tin người dùng hiện tại từ /users/me -->
+    <div class="card">
+        <h2>Thông tin tài khoản xác thực (/users/me)</h2>
+        <div class="info-row">
+            <span class="info-label">Mã ID:</span>
+            <span class="info-value" id="userId">Đang tải...</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Họ và tên:</span>
+            <span class="info-value" id="userFullName">Đang tải...</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Email:</span>
+            <span class="info-value" id="userEmail">Đang tải...</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Vai trò (Role):</span>
+            <span class="info-value" id="userRole" style="color: #38bdf8;">Đang tải...</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Trạng thái tài khoản:</span>
+            <span class="info-value" id="userLockStatus">Đang tải...</span>
+        </div>
+
+        <!-- Token với tính năng che giấu bảo mật -->
+        <div class="token-wrapper">
+            <div class="token-header">
+                <span>Mã JWT Token (Ký bảo mật Nimbus HS256):</span>
+                <div class="token-actions">
+                    <button class="btn-token-tool" id="btnToggleToken" onclick="toggleTokenMask()">👁️ Hiện đầy đủ</button>
+                    <button class="btn-token-tool" onclick="copyTokenToClipboard()">📋 Sao chép</button>
+                </div>
+            </div>
+            <div class="token-box" id="tokenDisplay">Đang tải...</div>
+        </div>
+    </div>
+
+    <!-- Khu vực kiểm thử bảng mã lỗi Bước 10 đề bài -->
+    <div class="card">
+        <h2>Kiểm thử các mã lỗi HTTP (Bước 10 bài giảng)</h2>
+        <p style="font-size: 13px; color: #94a3b8;">
+            Nhấp vào từng trường hợp để kiểm tra phản hồi ProblemDetail chuẩn từ Spring Security:
+        </p>
+
+        <div class="test-grid">
+            <button class="btn-test-card" onclick="testInvalidFormatToken(this)">
+                <span class="test-code-badge">HTTP 401</span>
+                <span class="test-title">JWT sai định dạng</span>
+            </button>
+            <button class="btn-test-card" onclick="testInvalidSignatureToken(this)">
+                <span class="test-code-badge">HTTP 401</span>
+                <span class="test-title">JWT sai chữ ký</span>
+            </button>
+            <button class="btn-test-card" onclick="testExpiredToken(this)">
+                <span class="test-code-badge">HTTP 401</span>
+                <span class="test-title">JWT đã hết hạn</span>
+            </button>
+            <button class="btn-test-card" onclick="testNoToken(this)">
+                <span class="test-code-badge">HTTP 401</span>
+                <span class="test-title">Chưa gửi Token</span>
+            </button>
+        </div>
+
+        <div id="testResultBox" class="result-box"></div>
+    </div>
+
+    <!-- Danh sách người dùng từ /users -->
+    <div class="card">
+        <h2>Danh sách tài khoản hệ thống (/users)</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Họ và tên</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="userListBody">
+                    <tr><td colspan="6">Đang tải danh sách...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/main.js"></script>
+</body>
+</html>
