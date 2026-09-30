@@ -28,7 +28,7 @@ public class User implements UserDetails {
     private String fullName;
 
     // Phân quyền người dùng (ROLE_USER, ROLE_ADMIN) - Mặc định an toàn luôn là ROLE_USER
-    @Column(nullable = false, columnDefinition = "varchar(50) default 'ROLE_USER'")
+    @Column(nullable = false, length = 50)
     private String role = "ROLE_USER";
 
     // Quản lý trạng thái khóa tài khoản

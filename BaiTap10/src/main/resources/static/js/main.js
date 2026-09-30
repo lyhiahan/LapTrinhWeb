@@ -239,20 +239,29 @@ async function loadProfileData() {
                 tr.appendChild(tdStatus);
 
                 const tdAction = document.createElement('td');
-                const btn = document.createElement('button');
-                btn.className = `btn-action ${isNonLocked ? 'btn-lock' : 'btn-unlock'}`;
-                btn.textContent = isNonLocked ? 'Khóa tài khoản' : 'Mở khóa';
-
-                if (u.id === currentUserId) {
-                    btn.disabled = true;
-                    btn.title = "Không thể tự khóa chính mình";
-                    btn.style.opacity = "0.4";
-                    btn.style.cursor = "not-allowed";
+                if (currentUserRole !== 'ROLE_ADMIN') {
+                    const noPerm = document.createElement('span');
+                    noPerm.style.color = '#94a3b8';
+                    noPerm.style.fontSize = '0.85rem';
+                    noPerm.style.fontStyle = 'italic';
+                    noPerm.textContent = 'Chỉ Quản trị viên';
+                    tdAction.appendChild(noPerm);
                 } else {
-                    btn.onclick = () => toggleLock(u.id, isNonLocked, btn);
-                }
+                    const btn = document.createElement('button');
+                    btn.className = `btn-action ${isNonLocked ? 'btn-lock' : 'btn-unlock'}`;
+                    btn.textContent = isNonLocked ? 'Khóa tài khoản' : 'Mở khóa';
 
-                tdAction.appendChild(btn);
+                    if (u.id === currentUserId) {
+                        btn.disabled = true;
+                        btn.title = "Không thể tự khóa chính mình";
+                        btn.style.opacity = "0.4";
+                        btn.style.cursor = "not-allowed";
+                    } else {
+                        btn.onclick = () => toggleLock(u.id, isNonLocked, btn);
+                    }
+
+                    tdAction.appendChild(btn);
+                }
                 tr.appendChild(tdAction);
 
                 tbody.appendChild(tr);
