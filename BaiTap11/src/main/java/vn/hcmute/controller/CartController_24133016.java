@@ -54,12 +54,12 @@ public class CartController_24133016 {
         }
         int stock = product.getStock() == null ? 0 : product.getStock();
         Map<String, Integer> cart = getCart(session);
-        int desired = cart.getOrDefault(videoId, 0) + Math.max(1, quantity);
+        long desired = (long) cart.getOrDefault(videoId, 0) + Math.max(1, quantity);
         int allowed = Math.min(stock, MAX_PER_ITEM);
         if (allowed < 1) {
             redirect.addFlashAttribute("error", "Sản phẩm đã hết hàng.");
         } else {
-            cart.put(videoId, Math.min(desired, allowed));
+            cart.put(videoId, (int) Math.min(desired, allowed));
             session.setAttribute(CART_SESSION_KEY, cart);
             redirect.addFlashAttribute("success", desired > allowed
                     ? "Đã điều chỉnh về số lượng tối đa có thể mua: " + allowed + "."

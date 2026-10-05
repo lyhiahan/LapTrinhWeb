@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import vn.hcmute.service.OrderService_24133016;
 
 @Controller
 public class OrderController_24133016 {
+    private static final String CHECKOUT_TOKEN = "checkoutToken";
     private final OrderService_24133016 orderService;
     private final IVideoService_24133016 videoService;
 
@@ -43,6 +45,9 @@ public class OrderController_24133016 {
         model.addAttribute("cartTotal", items.stream().map(CartItem_24133016::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
         model.addAttribute("user", user);
+        String checkoutToken = UUID.randomUUID().toString();
+        session.setAttribute(CHECKOUT_TOKEN, checkoutToken);
+        model.addAttribute("checkoutToken", checkoutToken);
         return "checkout";
     }
 
@@ -50,9 +55,18 @@ public class OrderController_24133016 {
     public String checkoutCod(@RequestParam String receiverName, @RequestParam String phone,
                               @RequestParam String address,
                               @RequestParam(required = false, defaultValue = "") String note,
+                              @RequestParam String checkoutToken,
                               HttpSession session, RedirectAttributes redirect) {
         User_24133016 user = currentUser(session);
         if (user == null) return "redirect:/login";
+        synchronized (session) {
+            String expected = (String) session.getAttribute(CHECKOUT_TOKEN);
+            if (expected == null || !expected.equals(checkoutToken)) {
+                redirect.addFlashAttribute("error", "Yêu cầu thanh toán đã hết hạn hoặc đã được xử lý. Vui lòng kiểm tra lịch sử đơn hàng.");
+                return "redirect:/cart";
+            }
+            session.removeAttribute(CHECKOUT_TOKEN);
+        }
         String validation = validate(receiverName, phone, address);
         if (validation == null && note != null && note.trim().length() > 500) {
             validation = "Ghi chú không được vượt quá 500 ký tự.";
