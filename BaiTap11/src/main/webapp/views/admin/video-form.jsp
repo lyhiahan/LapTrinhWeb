@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <html>
 <head>
     <title>${isEdit ? 'Cập nhật' : 'Thêm mới'} Video</title>
@@ -10,6 +11,13 @@
     </style>
 </head>
 <body>
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> ${error}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </c:if>
+
     <div class="mb-3">
         <a href="${pageContext.request.contextPath}/admin/videos" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left"></i> Quay lại danh sách
@@ -24,16 +32,22 @@
 
         <form action="${pageContext.request.contextPath}/admin/videos/${isEdit ? 'edit' : 'add'}"
               method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
 
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label"><strong>Mã Video *</strong></label>
-                    <input type="text" class="form-control" name="videoId" value="${video.videoId}"
-                           ${isEdit ? 'readonly' : ''} required placeholder="VD: VD001">
-                </div>
-                <div class="col-md-6 mb-3">
+                <c:if test="${isEdit}">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><strong>Mã Video</strong></label>
+                        <input type="text" class="form-control" name="videoId" value="${video.videoId}" readonly>
+                    </div>
+                </c:if>
+                <div class="${isEdit ? 'col-md-6' : 'col-md-12'} mb-3">
                     <label class="form-label"><strong>Tiêu đề *</strong></label>
-                    <input type="text" class="form-control" name="title" value="${video.title}" required placeholder="Nhập tiêu đề video">
+                    <input type="text" class="form-control" name="title" value="${video.title}"
+                           maxlength="200" required placeholder="Nhập tiêu đề video">
+                    <c:if test="${!isEdit}">
+                        <div class="form-text">Mã video sẽ được hệ thống tự động tạo khi lưu.</div>
+                    </c:if>
                 </div>
             </div>
 
@@ -108,7 +122,8 @@
 
             <div class="mb-3">
                 <label class="form-label"><strong>Mô tả</strong></label>
-                <textarea class="form-control" name="description" rows="4" placeholder="Nhập mô tả video">${video.description}</textarea>
+                <textarea class="form-control" name="description" rows="4" maxlength="500"
+                          placeholder="Nhập mô tả video">${video.description}</textarea>
             </div>
 
             <div class="text-end">

@@ -15,7 +15,7 @@
 			<property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://127.0.0.1;instanceName=SQLEXPRESS01;databaseName=WebProject_24133016;encrypt=true;trustServerCertificate=true;" />
 			<property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
 			<property name="jakarta.persistence.jdbc.user" value="sa" />
-			<property name="jakarta.persistence.jdbc.password" value="giahan" />
+			<property name="jakarta.persistence.jdbc.password" value="" />
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.hbm2ddl.auto" value="none" />

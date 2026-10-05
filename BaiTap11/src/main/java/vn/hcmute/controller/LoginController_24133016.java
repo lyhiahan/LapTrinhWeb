@@ -50,7 +50,7 @@ public class LoginController_24133016 {
 
         // Kiểm tra tài khoản chưa kích hoạt
         User_24133016 checkUser = userService.findByUsername(username);
-        if (checkUser != null && password.equals(checkUser.getPassword())
+        if (checkUser != null && userService.matchesPassword(checkUser, password)
                 && (checkUser.getActive() == null || !checkUser.getActive())) {
             model.addAttribute("alert", "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để xác thực mã OTP.");
             model.addAttribute("inactiveEmail", checkUser.getEmail());

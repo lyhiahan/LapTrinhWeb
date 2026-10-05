@@ -6,10 +6,10 @@ GO
 -- 1. Bảng Users
 CREATE TABLE Users (
     Username NVARCHAR(50) PRIMARY KEY,
-    Password NVARCHAR(50) NOT NULL,
+    Password NVARCHAR(255) NOT NULL,
     Phone NVARCHAR(15),
     Fullname NVARCHAR(50),
-    Email NVARCHAR(150),
+    Email NVARCHAR(150) UNIQUE,
     Admin BIT DEFAULT 0,
     Active BIT DEFAULT 1,
     Images NVARCHAR(500),

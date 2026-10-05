@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <html>
 <head>
     <title>Trang Chủ - Video</title>
@@ -82,7 +83,8 @@
                                         <small class="text-muted">Còn ${video.stock} sản phẩm</small>
                                     </div>
                                     <form action="${pageContext.request.contextPath}/cart/add/${video.videoId}" method="post">
-                                        <input type="hidden" name="returnUrl" value="/home">
+                                        <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
+                                        <input type="hidden" name="returnUrl" value="/home?catId=${catData.category.categoryId}&amp;catPage=${catData.currentPage}">
                                         <button class="btn btn-primary btn-sm" ${video.stock == null || video.stock <= 0 ? 'disabled' : ''}>
                                             <i class="fas fa-cart-plus"></i> Thêm
                                         </button>

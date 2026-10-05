@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,25 +21,26 @@
         <h2>Xác thực OTP</h2>
         <p class="text-center text-muted mb-4">
             Nhập mã OTP 6 chữ số đã gửi tới email:<br>
-            <strong>${email}</strong>
+            <strong>${fn:escapeXml(email)}</strong>
         </p>
 
         <c:if test="${not empty alert}">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle"></i> ${alert}
+                <i class="fas fa-exclamation-triangle"></i> <c:out value="${alert}"/>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </c:if>
 
         <c:if test="${not empty success}">
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle"></i> ${success}
+                <i class="fas fa-check-circle"></i> <c:out value="${success}"/>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </c:if>
 
         <form action="${pageContext.request.contextPath}/verify-otp" method="post">
-            <input type="hidden" name="email" value="${email}">
+            <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
+            <input type="hidden" name="email" value="${fn:escapeXml(email)}">
             <div class="mb-4">
                 <input type="text" class="form-control" name="otp" maxlength="6" placeholder="______" required pattern="[0-9]{6}">
             </div>
@@ -48,7 +50,8 @@
         </form>
 
         <form action="${pageContext.request.contextPath}/verify-otp" method="post" class="text-center">
-            <input type="hidden" name="email" value="${email}">
+            <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
+            <input type="hidden" name="email" value="${fn:escapeXml(email)}">
             <input type="hidden" name="action" value="resend">
             <button type="submit" class="btn btn-link text-decoration-none">
                 <i class="fas fa-redo"></i> Gửi lại mã OTP

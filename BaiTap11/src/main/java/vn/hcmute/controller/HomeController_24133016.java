@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,18 +54,25 @@ public class HomeController_24133016 {
             long videoCount = videoService.countByCategoryId(cat.getCategoryId());
             catData.put("videoCount", videoCount);
 
+            int totalPages = videoCount == 0 ? 0
+                    : (int) Math.min(Integer.MAX_VALUE, ((videoCount - 1) / videosPerPage) + 1);
+
             // Tính trang hiện tại cho category này
             int currentPage = 1;
             if (catId != null && catId == cat.getCategoryId() && catPage != null) {
-                currentPage = catPage;
+                currentPage = Math.max(1, catPage);
+            }
+            if (totalPages > 0) {
+                currentPage = Math.min(currentPage, totalPages);
             }
 
             Page<Video_24133016> videoPage = videoService.findByCategoryId(
-                cat.getCategoryId(), PageRequest.of(currentPage - 1, videosPerPage));
+                cat.getCategoryId(), PageRequest.of(currentPage - 1, videosPerPage,
+                    Sort.by(Sort.Direction.ASC, "videoId")));
 
             catData.put("videos", videoPage.getContent());
             catData.put("currentPage", currentPage);
-            catData.put("totalPages", videoPage.getTotalPages());
+            catData.put("totalPages", totalPages);
 
             // Tính share count và like count cho mỗi video
             Map<String, Long> shareCountMap = new HashMap<>();

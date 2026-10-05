@@ -1,6 +1,7 @@
 package vn.hcmute.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,4 +13,8 @@ public interface ShareRepository_24133016 extends JpaRepository<Share_24133016, 
 
     @Query("SELECT COUNT(s) FROM Share_24133016 s WHERE s.video.videoId = :videoId")
     long countByVideoId(@Param("videoId") String videoId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("DELETE FROM Share_24133016 s WHERE s.video.videoId = :videoId")
+    int deleteByVideoId(@Param("videoId") String videoId);
 }

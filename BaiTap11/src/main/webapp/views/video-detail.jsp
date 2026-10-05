@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <html>
 <head>
     <title>Chi tiết Video - ${video.title}</title>
@@ -89,6 +90,7 @@
                             <small class="text-muted">Tồn kho: ${video.stock}</small>
                         </div>
                         <form action="${pageContext.request.contextPath}/cart/add/${video.videoId}" method="post" class="d-flex gap-2">
+                            <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
                             <input type="hidden" name="returnUrl" value="/video/${video.videoId}">
                             <input class="form-control" style="width:85px" type="number" name="quantity" value="1" min="1" max="${video.stock}">
                             <button class="btn btn-primary" ${video.stock == null || video.stock <= 0 ? 'disabled' : ''}>

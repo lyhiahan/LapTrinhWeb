@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <html>
 <head>
     <title>Quản lý Video</title>
@@ -103,11 +104,14 @@
                         <a href="${pageContext.request.contextPath}/admin/videos/edit/${video.videoId}" class="btn btn-sm btn-warning" title="Sửa">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="${pageContext.request.contextPath}/admin/videos/delete/${video.videoId}"
-                           class="btn btn-sm btn-danger" title="Xóa"
-                           onclick="return confirm('Bạn có chắc chắn muốn xóa video này?');">
-                            <i class="fas fa-trash"></i>
-                        </a>
+                        <form action="${pageContext.request.contextPath}/admin/videos/delete/${video.videoId}"
+                              method="post" class="d-inline"
+                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa video này?');">
+                            <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
+                            <button type="submit" class="btn btn-sm btn-danger" title="Xóa">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
                     </td>
                 </tr>
             </c:forEach>

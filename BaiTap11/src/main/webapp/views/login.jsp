@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,30 +22,34 @@
 
         <c:if test="${not empty alert}">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle"></i> ${alert}
+                <i class="fas fa-exclamation-triangle"></i> <c:out value="${alert}"/>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </c:if>
 
         <c:if test="${not empty success}">
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle"></i> ${success}
+                <i class="fas fa-check-circle"></i> <c:out value="${success}"/>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </c:if>
 
         <c:if test="${not empty inactiveEmail}">
+            <c:url var="verifyOtpUrl" value="/verify-otp">
+                <c:param name="email" value="${inactiveEmail}"/>
+            </c:url>
             <div class="alert alert-warning">
-                <a href="${pageContext.request.contextPath}/verify-otp?email=${inactiveEmail}" class="alert-link">
+                <a href="${fn:escapeXml(verifyOtpUrl)}" class="alert-link">
                     <i class="fas fa-key"></i> Nhấn vào đây để xác thực OTP
                 </a>
             </div>
         </c:if>
 
         <form action="${pageContext.request.contextPath}/login" method="post">
+            <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-user"></i> Tên đăng nhập</label>
-                <input type="text" class="form-control" name="username" value="${username}" placeholder="Nhập tên đăng nhập" required>
+                <input type="text" class="form-control" name="username" value="${fn:escapeXml(username)}" placeholder="Nhập tên đăng nhập" required>
             </div>
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-lock"></i> Mật khẩu</label>

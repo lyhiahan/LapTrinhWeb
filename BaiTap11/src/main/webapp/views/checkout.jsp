@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <html>
 <head><title>Thanh toán COD</title></head>
 <body>
@@ -11,6 +12,7 @@
         <div class="card border-0 shadow-sm p-4">
             <h5 class="mb-3">Thông tin nhận hàng</h5>
             <form action="${pageContext.request.contextPath}/checkout/cod" method="post">
+                <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
                 <input type="hidden" name="checkoutToken" value="${checkoutToken}">
                 <div class="mb-3"><label class="form-label">Họ tên người nhận *</label><input class="form-control" name="receiverName" maxlength="100" required value="${user.fullname}"></div>
                 <div class="mb-3"><label class="form-label">Số điện thoại *</label><input class="form-control" name="phone" maxlength="11" pattern="0[0-9]{9,10}" required value="${user.phone}"></div>

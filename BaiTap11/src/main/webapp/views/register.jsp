@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,35 +21,36 @@
 
         <c:if test="${not empty alert}">
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="fas fa-exclamation-triangle"></i> ${alert}
+                <i class="fas fa-exclamation-triangle"></i> <c:out value="${alert}"/>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         </c:if>
 
         <form action="${pageContext.request.contextPath}/register" method="post">
+            <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-user"></i> Tên đăng nhập *</label>
-                <input type="text" class="form-control" name="username" value="${username}" placeholder="Nhập tên đăng nhập" required>
+                <input type="text" class="form-control" name="username" value="${fn:escapeXml(username)}" maxlength="50" placeholder="Nhập tên đăng nhập" required>
             </div>
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-id-card"></i> Họ tên *</label>
-                <input type="text" class="form-control" name="fullname" value="${fullname}" placeholder="Nhập họ tên đầy đủ" required>
+                <input type="text" class="form-control" name="fullname" value="${fn:escapeXml(fullname)}" maxlength="50" placeholder="Nhập họ tên đầy đủ" required>
             </div>
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-envelope"></i> Email *</label>
-                <input type="email" class="form-control" name="email" value="${email}" placeholder="Nhập email" required>
+                <input type="email" class="form-control" name="email" value="${fn:escapeXml(email)}" maxlength="150" placeholder="Nhập email" required>
             </div>
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-phone"></i> Số điện thoại</label>
-                <input type="text" class="form-control" name="phone" value="${phone}" placeholder="Nhập số điện thoại">
+                <input type="text" class="form-control" name="phone" value="${fn:escapeXml(phone)}" maxlength="15" placeholder="Nhập số điện thoại">
             </div>
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-lock"></i> Mật khẩu *</label>
-                <input type="password" class="form-control" name="password" placeholder="Nhập mật khẩu" required>
+                <input type="password" class="form-control" name="password" maxlength="128" placeholder="Nhập mật khẩu" required>
             </div>
             <div class="mb-3">
                 <label class="form-label"><i class="fas fa-lock"></i> Xác nhận mật khẩu *</label>
-                <input type="password" class="form-control" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+                <input type="password" class="form-control" name="confirmPassword" maxlength="128" placeholder="Nhập lại mật khẩu" required>
             </div>
             <button type="submit" class="btn btn-primary w-100 mb-3">
                 <i class="fas fa-user-plus"></i> Đăng Ký

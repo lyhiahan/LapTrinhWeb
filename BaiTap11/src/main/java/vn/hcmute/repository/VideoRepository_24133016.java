@@ -19,6 +19,9 @@ public interface VideoRepository_24133016 extends JpaRepository<Video_24133016, 
     Page<Video_24133016> findByCategory_CategoryId(int categoryId, Pageable pageable);
     Page<Video_24133016> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
+    @Query("SELECT v.videoId FROM Video_24133016 v")
+    List<String> findAllVideoIds();
+
     @Query("SELECT COUNT(v) FROM Video_24133016 v WHERE v.category.categoryId = :categoryId")
     long countByCategoryId(@Param("categoryId") int categoryId);
 

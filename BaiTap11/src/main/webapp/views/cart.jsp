@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions"%>
 <html>
 <head>
     <title>Giỏ hàng</title>
@@ -49,6 +50,7 @@
                             <td><fmt:formatNumber value="${item.product.price}" type="number"/> ₫</td>
                             <td>
                                 <form action="${pageContext.request.contextPath}/cart/update/${item.product.videoId}" method="post" class="d-flex gap-2">
+                                    <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
                                     <input class="form-control quantity-input" type="number" name="quantity" value="${item.quantity}" min="0" max="${item.product.stock}">
                                     <button class="btn btn-outline-primary btn-sm" title="Cập nhật"><i class="fas fa-rotate"></i></button>
                                 </form>
@@ -56,6 +58,7 @@
                             <td class="fw-bold text-danger"><fmt:formatNumber value="${item.subtotal}" type="number"/> ₫</td>
                             <td>
                                 <form action="${pageContext.request.contextPath}/cart/remove/${item.product.videoId}" method="post">
+                                    <input type="hidden" name="_csrf" value="${fn:escapeXml(csrfToken)}">
                                     <button class="btn btn-outline-danger btn-sm" title="Xóa"><i class="fas fa-trash"></i></button>
                                 </form>
                             </td>

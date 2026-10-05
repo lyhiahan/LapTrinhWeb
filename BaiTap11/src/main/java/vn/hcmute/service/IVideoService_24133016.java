@@ -10,7 +10,7 @@ import vn.hcmute.entity.Video_24133016;
 public interface IVideoService_24133016 {
     List<Video_24133016> findAll();
     Video_24133016 findById(String videoId);
-    void insert(Video_24133016 video);
+    Video_24133016 insert(Video_24133016 video);
     void update(Video_24133016 video);
     void delete(String videoId) throws Exception;
     List<Video_24133016> findByCategoryId(int categoryId);
